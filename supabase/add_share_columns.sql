@@ -1,0 +1,5 @@
+ALTER TABLE cases ADD COLUMN IF NOT EXISTS share_token TEXT;
+ALTER TABLE cases ADD COLUMN IF NOT EXISTS share_expired_at TIMESTAMPTZ;
+ALTER TABLE cases ADD COLUMN IF NOT EXISTS is_shareable BOOLEAN DEFAULT false;
+ALTER TABLE cases ADD COLUMN IF NOT EXISTS allow_contact BOOLEAN DEFAULT false;
+CREATE INDEX IF NOT EXISTS idx_cases_share_token ON cases(share_token);
