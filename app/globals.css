@@ -79,6 +79,7 @@
     background-color: var(--bg-primary);
     color: var(--text-primary);
     font-family: var(--font-plus-jakarta-sans), system-ui, sans-serif;
+    overflow-y: scroll;
   }
 
   h1,
