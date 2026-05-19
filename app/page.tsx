@@ -368,6 +368,145 @@ function AnimatedScoreCard() {
   );
 }
 
+// ─── Animated Notifications ──────────────────────────────────────────────────
+const NOTIFICATIONS = [
+  {
+    id: 1,
+    iconType: 'check',
+    title: 'Dokumen berhasil dibuat',
+    desc: 'PDF kronologi siap diunduh',
+    time: '2 menit lalu',
+    color: 'emerald',
+  },
+  {
+    id: 2,
+    iconType: 'document',
+    title: 'Score kelengkapan: 87/100',
+    desc: 'Dokumen hampir sempurna',
+    time: '5 menit lalu',
+    color: 'blue',
+  },
+  {
+    id: 3,
+    iconType: 'scale',
+    title: 'Legal Radar selesai',
+    desc: '3 pasal hukum teridentifikasi',
+    time: '8 menit lalu',
+    color: 'purple',
+  },
+  {
+    id: 4,
+    iconType: 'location',
+    title: 'LBH terdekat ditemukan',
+    desc: 'LBH Jakarta — 2.3 km dari lokasi',
+    time: '12 menit lalu',
+    color: 'amber',
+  },
+];
+
+function AnimatedNotifications() {
+  const [visibleCount, setVisibleCount] = useState(0);
+  const [fadeOut, setFadeOut] = useState(false);
+
+  useEffect(() => {
+    if (visibleCount >= NOTIFICATIONS.length) {
+      const t = setTimeout(() => {
+        setFadeOut(true);
+        setTimeout(() => {
+          setVisibleCount(0);
+          setFadeOut(false);
+        }, 600);
+      }, 2500);
+      return () => clearTimeout(t);
+    }
+    const t = setTimeout(() => setVisibleCount(v => v + 1), 1200);
+    return () => clearTimeout(t);
+  }, [visibleCount]);
+
+  const colorMap: Record<string, { bg: string; border: string; dot: string }> = {
+    emerald: { bg: 'bg-emerald-500/10', border: 'border-emerald-500/30', dot: 'bg-emerald-400' },
+    blue: { bg: 'bg-blue-500/10', border: 'border-blue-500/30', dot: 'bg-blue-400' },
+    purple: { bg: 'bg-purple-500/10', border: 'border-purple-500/30', dot: 'bg-purple-400' },
+    amber: { bg: 'bg-amber-500/10', border: 'border-amber-500/30', dot: 'bg-amber-400' },
+  };
+
+  const getNotificationIcon = (iconType: string) => {
+    switch (iconType) {
+      case 'check':
+        return <CheckCircle className="w-5 h-5" />;
+      case 'document':
+        return <FileText className="w-5 h-5" />;
+      case 'scale':
+        return <Scale className="w-5 h-5" />;
+      case 'location':
+        return <MapPin className="w-5 h-5" />;
+      default:
+        return null;
+    }
+  };
+
+  return (
+    <div
+      className="hidden lg:flex flex-col justify-center gap-3 w-64 flex-shrink-0"
+      style={{ opacity: fadeOut ? 0 : 1, transition: 'opacity 0.5s ease' }}
+    >
+      {/* Header label */}
+      <div className="flex items-center gap-2 mb-1">
+        <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+        <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Aktivitas Terkini</p>
+      </div>
+
+      {NOTIFICATIONS.slice(0, visibleCount).map((notif, i) => {
+        const c = colorMap[notif.color];
+        return (
+          <div
+            key={notif.id}
+            className={`${c.bg} border ${c.border} rounded-xl px-4 py-3 backdrop-blur-sm shadow-lg`}
+            style={{
+              animation: 'notifSlideIn 0.4s cubic-bezier(0.34,1.56,0.64,1) both',
+            }}
+          >
+            <div className="flex items-start gap-3">
+              <div className="flex-shrink-0 mt-0.5 text-slate-300">{getNotificationIcon(notif.iconType)}</div>
+              <div className="flex-1 min-w-0">
+                <p className="text-xs font-bold text-slate-200 leading-tight">{notif.title}</p>
+                <p className="text-[10px] text-slate-400 mt-0.5 leading-tight">{notif.desc}</p>
+                <div className="flex items-center gap-1 mt-1.5">
+                  <div className={`w-1 h-1 rounded-full ${c.dot}`} />
+                  <p className="text-[9px] text-slate-500 font-medium">{notif.time}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      })}
+
+      {/* Placeholder cards saat belum muncul */}
+      {Array.from({ length: Math.max(0, NOTIFICATIONS.length - visibleCount) }).map((_, i) => (
+        <div
+          key={`placeholder-${i}`}
+          className="border border-slate-700/30 rounded-xl px-4 py-3 opacity-20"
+        >
+          <div className="flex items-start gap-3">
+            <div className="w-5 h-5 rounded-full bg-slate-700 flex-shrink-0" />
+            <div className="flex-1 space-y-1.5">
+              <div className="h-2 bg-slate-700 rounded w-3/4" />
+              <div className="h-1.5 bg-slate-700 rounded w-1/2" />
+            </div>
+          </div>
+        </div>
+      ))}
+
+      <style>{`
+        @keyframes notifSlideIn {
+          from { opacity: 0; transform: translateX(-16px) scale(0.95); }
+          to   { opacity: 1; transform: translateX(0) scale(1); }
+        }
+      `}</style>
+    </div>
+  );
+}
+
 // ─── Main Page ────────────────────────────────────────────────────────────────
 export default function HomePage() {
   const [scrolled, setScrolled] = useState(false);
@@ -394,17 +533,19 @@ export default function HomePage() {
           scrolled
             ? 'bg-slate-900/70 backdrop-blur-sm border-b border-slate-800 shadow-lg shadow-black/20'
             : 'bg-slate-950/60 backdrop-blur-sm border-b border-slate-800/40'
-        }`}
+        } min-h-[70px]`}
       >
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
-          <button onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className="text-xl font-bold text-white flex items-center gap-2">
+        <div className="w-full px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between min-h-[70px]">
+          {/* Logo — kiri mepet */}
+          <button onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className="text-xl font-bold text-white flex items-center gap-2 cursor-pointer flex-shrink-0">
             <div className="p-1 bg-emerald-950 rounded text-emerald-400">
               <Shield className="w-5 h-5" />
             </div>
             <span>WitnessChain</span>
           </button>
 
-          <div className="hidden md:flex items-center gap-8">
+          {/* Nav items — tengah absolute */}
+          <div className="hidden md:flex items-center gap-8 absolute left-1/2 transform -translate-x-1/2">
             {[
               { label: 'Cara Kerja', id: 'how-it-works' },
               { label: 'Fitur', id: 'features' },
@@ -413,14 +554,15 @@ export default function HomePage() {
               <button
                 key={item.id}
                 onClick={() => document.getElementById(item.id)?.scrollIntoView({ behavior: 'smooth' })}
-                className="text-slate-300 hover:text-white transition-colors font-medium text-sm"
+                className="text-slate-300 hover:text-white transition-colors font-medium text-sm cursor-pointer"
               >
                 {item.label}
               </button>
             ))}
           </div>
 
-          <div className="flex items-center gap-3">
+          {/* Buttons — kanan mepet */}
+          <div className="flex items-center gap-3 flex-shrink-0 ml-auto">
             <ThemeToggle />
             <Link href="/login">
               <Button variant="ghost" size="sm" className="font-medium hidden sm:flex text-slate-300 hover:text-white">Masuk</Button>
@@ -429,7 +571,7 @@ export default function HomePage() {
               <Button variant="primary" size="sm" className="font-semibold hidden sm:flex bg-emerald-500 hover:bg-emerald-400 text-white">Mulai Gratis</Button>
             </Link>
             <button
-              className="md:hidden p-2 text-white"
+              className="md:hidden p-2 text-white cursor-pointer"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             >
               {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
@@ -446,7 +588,7 @@ export default function HomePage() {
               <button
                 key={item.id}
                 onClick={() => { document.getElementById(item.id)?.scrollIntoView({ behavior: 'smooth' }); setMobileMenuOpen(false); }}
-                className="block w-full text-left text-slate-300 p-2 font-medium"
+                className="block w-full text-left text-slate-300 p-2 font-medium cursor-pointer"
               >{item.label}</button>
             ))}
             <Link href="/login" className="block">
@@ -518,9 +660,45 @@ export default function HomePage() {
             </button>
           </div>
 
-          {/* Fixed height container — prevents layout shift */}
-          <div className="h-[420px]">
-            <AnimatedChatCard />
+          {/* Hero bottom: Notifications + Chat + Maskot */}
+          <div className="relative w-full h-96">
+            {/* Notification column — kiri */}
+            <div className="hidden lg:block absolute left-0 bottom-0">
+              <AnimatedNotifications />
+            </div>
+
+            {/* Chat Card — tengah */}
+            <div className="absolute left-1/2 bottom-0 transform -translate-x-1/2 h-[420px] w-full max-w-sm">
+              <AnimatedChatCard />
+            </div>
+
+            {/* Maskot — kanan, desktop only */}
+            <div className="hidden md:block absolute bottom-[-150px] right-1/5 translate-x-2/3 flex-shrink-0 -ml-4 h-[550px]">
+
+              {/* Maskot image */}
+              <img
+                src="/maskot.webp"
+                alt="WitnessChain Maskot"
+                className="relative z-10 select-none"
+                style={{
+                  width: '750px',
+                  height: 'auto',
+                  maxHeight: '420px',
+                  objectFit: 'contain',
+                  animation: 'maskotFloat 3s ease-in-out infinite',
+                }}
+                draggable={false}
+              />
+
+              <style>{`
+                @keyframes maskotFloat {
+                  0%, 100% { transform: translateY(0px) rotate(-1deg); }
+                  50%       { transform: translateY(-12px) rotate(1deg); }
+                }
+              `}</style>
+
+            </div>
+
           </div>
         </div>
       </section>
