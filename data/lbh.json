@@ -1,0 +1,192 @@
+[
+  {
+    "id": "lbh-jakarta-1",
+    "name": "LBH Jakarta",
+    "address": "Jl. Pangeran Diponegoro No. 74, Menteng",
+    "city": "Jakarta",
+    "phone": "(021) 314-5518",
+    "lat": -6.1944,
+    "lng": 106.8429,
+    "specialization": ["penggusuran", "sengketa_lahan", "pelanggaran_hak"]
+  },
+  {
+    "id": "lbh-jakarta-2",
+    "name": "LBH YLBHI Jakarta",
+    "address": "Jl. Mayjen Sutoyo No. 17, Cikini, Jakarta Pusat",
+    "city": "Jakarta",
+    "phone": "(021) 392-2346",
+    "lat": -6.1889,
+    "lng": 106.8263,
+    "specialization": ["pelanggaran_hak", "sengketa_lahan", "penggusuran"]
+  },
+  {
+    "id": "lbh-jakarta-3",
+    "name": "PBHI Jakarta",
+    "address": "Jl. Cideng Barat No. 30, Jakarta Pusat",
+    "city": "Jakarta",
+    "phone": "(021) 6350-4507",
+    "lat": -6.1675,
+    "lng": 106.8133,
+    "specialization": ["penggusuran", "pelanggaran_hak"]
+  },
+  {
+    "id": "lbh-bandung-1",
+    "name": "LBH Bandung",
+    "address": "Jl. Cisanggarung No. 16, Bandung",
+    "city": "Bandung",
+    "phone": "(022) 421-5267",
+    "lat": -6.8667,
+    "lng": 107.6095,
+    "specialization": ["sengketa_lahan", "penggusuran", "pelanggaran_hak"]
+  },
+  {
+    "id": "lbh-bandung-2",
+    "name": "LBH Perempuan Bandung",
+    "address": "Jl. Pelajar No. 77, Bandung",
+    "city": "Bandung",
+    "phone": "(022) 601-7893",
+    "lat": -6.9147,
+    "lng": 107.6145,
+    "specialization": ["pelanggaran_hak", "penggusuran"]
+  },
+  {
+    "id": "lbh-surabaya-1",
+    "name": "LBH Surabaya",
+    "address": "Jl. Raya Gubeng No. 110, Surabaya",
+    "city": "Surabaya",
+    "phone": "(031) 503-8234",
+    "lat": -7.2745,
+    "lng": 112.7508,
+    "specialization": ["penggusuran", "sengketa_lahan", "pelanggaran_hak"]
+  },
+  {
+    "id": "lbh-surabaya-2",
+    "name": "LBH APIK Surabaya",
+    "address": "Jl. Kedung Asem No. 121, Surabaya",
+    "city": "Surabaya",
+    "phone": "(031) 743-1234",
+    "lat": -7.2458,
+    "lng": 112.7456,
+    "specialization": ["pelanggaran_hak", "penggusuran"]
+  },
+  {
+    "id": "lbh-yogyakarta-1",
+    "name": "LBH Yogyakarta",
+    "address": "Jl. Kusumanegara No. 74, Yogyakarta",
+    "city": "Yogyakarta",
+    "phone": "(0274) 372-089",
+    "lat": -7.7894,
+    "lng": 110.4101,
+    "specialization": ["sengketa_lahan", "penggusuran", "pelanggaran_hak"]
+  },
+  {
+    "id": "lbh-yogyakarta-2",
+    "name": "Perkumpulan Hak Asasi Manusia DIY",
+    "address": "Jl. Kaliurang KM 7.5, Yogyakarta",
+    "city": "Yogyakarta",
+    "phone": "(0274) 886-345",
+    "lat": -7.7546,
+    "lng": 110.4283,
+    "specialization": ["pelanggaran_hak", "pencemaran_lingkungan"]
+  },
+  {
+    "id": "lbh-medan-1",
+    "name": "LBH Medan",
+    "address": "Jl. Gatot Subroto No. 235, Medan",
+    "city": "Medan",
+    "phone": "(061) 656-1234",
+    "lat": 3.1319,
+    "lng": 101.6821,
+    "specialization": ["penggusuran", "sengketa_lahan", "pelanggaran_hak"]
+  },
+  {
+    "id": "lbh-medan-2",
+    "name": "KPA Medan",
+    "address": "Jl. HM Said No. 45, Medan",
+    "city": "Medan",
+    "phone": "(061) 452-3891",
+    "lat": 3.1456,
+    "lng": 101.6934,
+    "specialization": ["pelanggaran_hak", "pencemaran_lingkungan"]
+  },
+  {
+    "id": "lbh-makassar-1",
+    "name": "LBH Makassar",
+    "address": "Jl. Sultan Alauddin No. 123, Makassar",
+    "city": "Makassar",
+    "phone": "(0411) 450-3847",
+    "lat": -5.1289,
+    "lng": 119.4321,
+    "specialization": ["sengketa_lahan", "penggusuran", "pelanggaran_hak"]
+  },
+  {
+    "id": "lbh-makassar-2",
+    "name": "Yayasan HAM Makassar",
+    "address": "Jl. Nusantara No. 89, Makassar",
+    "city": "Makassar",
+    "phone": "(0411) 324-5876",
+    "lat": -5.1456,
+    "lng": 119.4567,
+    "specialization": ["pelanggaran_hak", "penggusuran"]
+  },
+  {
+    "id": "lbh-semarang-1",
+    "name": "LBH Semarang",
+    "address": "Jl. Pandanaran No. 30, Semarang",
+    "city": "Semarang",
+    "phone": "(024) 841-0234",
+    "lat": -7.0097,
+    "lng": 110.4179,
+    "specialization": ["penggusuran", "sengketa_lahan", "pelanggaran_hak"]
+  },
+  {
+    "id": "lbh-semarang-2",
+    "name": "KOPHI Semarang",
+    "address": "Jl. Imam Bonjol No. 156, Semarang",
+    "city": "Semarang",
+    "phone": "(024) 412-3456",
+    "lat": -7.0234,
+    "lng": 110.4089,
+    "specialization": ["pelanggaran_hak", "pencemaran_lingkungan"]
+  },
+  {
+    "id": "lbh-palembang-1",
+    "name": "LBH Palembang",
+    "address": "Jl. Jati Aya Dalam No. 40, Palembang",
+    "city": "Palembang",
+    "phone": "(0711) 212-3456",
+    "lat": -3.0073,
+    "lng": 104.7587,
+    "specialization": ["sengketa_lahan", "penggusuran", "pelanggaran_hak"]
+  },
+  {
+    "id": "lbh-banjarmasin-1",
+    "name": "LBH Banjarmasin",
+    "address": "Jl. A. Yani No. 67, Banjarmasin",
+    "city": "Banjarmasin",
+    "phone": "(0511) 334-5678",
+    "lat": -3.3286,
+    "lng": 114.5904,
+    "specialization": ["penggusuran", "sengketa_lahan", "pencemaran_lingkungan"]
+  },
+  {
+    "id": "lbh-samarinda-1",
+    "name": "LBH Samarinda",
+    "address": "Jl. Merdeka No. 123, Samarinda",
+    "city": "Samarinda",
+    "phone": "(0541) 456-7890",
+    "lat": -0.5,
+    "lng": 117.1431,
+    "specialization": ["pencemaran_lingkungan", "sengketa_lahan", "pelanggaran_hak"]
+  },
+  {
+    "id": "lbh-manado-1",
+    "name": "LBH Manado",
+    "address": "Jl. Piere Tendean No. 29, Manado",
+    "city": "Manado",
+    "phone": "(0431) 567-8901",
+    "lat": 1.4897,
+    "lng": 124.7625,
+    "specialization": ["pelanggaran_hak", "sengketa_lahan", "penggusuran"]
+  }
+]
