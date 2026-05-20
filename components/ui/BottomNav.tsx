@@ -16,11 +16,16 @@ export function BottomNav() {
   ];
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-50 w-full backdrop-blur-xl bg-white/80 dark:bg-slate-900/80 border-t border-slate-200/50 dark:border-slate-800/50" style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
-      <div className="flex justify-between items-center px-4 h-16 max-w-md mx-auto">
+    // Outer wrapper: fixed, full width, transparent — only for positioning + safe area
+    <div
+      className="fixed bottom-0 left-0 right-0 z-50 flex justify-center pb-3 pointer-events-none"
+      style={{ paddingBottom: 'max(0.75rem, env(safe-area-inset-bottom))' }}
+    >
+      {/* The floating Dynamic Island pill */}
+      <nav className="pointer-events-auto flex items-center gap-1 px-3 py-2 rounded-2xl border border-slate-700/50 bg-slate-900/80 backdrop-blur-2xl shadow-2xl shadow-black/50 transition-all duration-500">
         {navItems.map((item) => {
           const Icon = item.icon;
-          const isActive = 
+          const isActive =
             item.name === 'Hasil' ? pathname.startsWith('/result') :
             item.name === 'Legal' ? pathname === '/legal-radar' :
             pathname === item.href;
@@ -29,24 +34,40 @@ export function BottomNav() {
             <Link
               key={item.name}
               href={item.href}
-              className="relative flex flex-col items-center justify-center w-16 h-full transition-transform duration-100 active:scale-90"
+              className={`
+                relative flex flex-col items-center justify-center
+                px-4 py-2 rounded-xl
+                transition-all duration-200 active:scale-90
+                group
+                ${isActive
+                  ? 'bg-emerald-500/15 border border-emerald-500/25'
+                  : 'border border-transparent hover:bg-slate-800/60 hover:border-slate-700/40'
+                }
+              `}
             >
-              <div className="relative flex flex-col items-center justify-center w-full h-full z-10">
-                <Icon className={`w-[22px] h-[22px] mb-1 transition-colors ${isActive ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-400 dark:text-slate-500'}`} />
-                <span className={`text-[10px] font-semibold transition-colors ${isActive ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-400 dark:text-slate-500'}`}>
-                  {item.name}
-                </span>
-                {isActive && (
-                  <div className="absolute top-1 left-1/2 transform -translate-x-1/2 -mt-1.5 w-1 h-1 bg-emerald-500 rounded-full" />
-                )}
-              </div>
+              {/* Active dot indicator (top) */}
               {isActive && (
-                <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-12 h-10 bg-emerald-50 dark:bg-emerald-900/30 rounded-xl -z-10" />
+                <span className="absolute -top-1 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-emerald-400 shadow-[0_0_6px_rgba(52,211,153,0.8)]" />
               )}
+
+              <Icon
+                className={`w-5 h-5 mb-1 transition-all duration-200 ${
+                  isActive
+                    ? 'text-emerald-400 drop-shadow-[0_0_6px_rgba(52,211,153,0.5)]'
+                    : 'text-slate-500 group-hover:text-slate-300'
+                }`}
+              />
+              <span
+                className={`text-[10px] font-bold tracking-wide transition-colors duration-200 ${
+                  isActive ? 'text-emerald-400' : 'text-slate-500 group-hover:text-slate-300'
+                }`}
+              >
+                {item.name}
+              </span>
             </Link>
           );
         })}
-      </div>
+      </nav>
     </div>
   );
 }
