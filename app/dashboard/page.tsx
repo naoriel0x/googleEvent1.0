@@ -5,8 +5,8 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { supabaseClient } from "@/lib/supabase";
 import { Button } from "@/components/ui/Button";
-import { Spinner } from "@/components/ui/Spinner";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
+import { Spinner } from "@/components/ui/Spinner";
 import type { Case } from "@/types";
 import {
   Shield,
@@ -96,8 +96,8 @@ function DashboardNavbar({
           shadow-2xl
           transition-all duration-500 ease-[cubic-bezier(0.25,0.46,0.45,0.94)]
           ${scrolled
-            ? "bg-slate-900/85 border-slate-700/70 shadow-black/60 scale-[0.98]"
-            : "bg-slate-900/70 border-slate-700/50 shadow-black/40"
+            ? "bg-white/90 dark:bg-slate-900/85 border-slate-200/80 dark:border-slate-700/70 shadow-slate-300/30 dark:shadow-black/60 scale-[0.98]"
+            : "bg-white/80 dark:bg-slate-900/70 border-slate-200/70 dark:border-slate-700/50 shadow-slate-200/20 dark:shadow-black/40"
           }
         `}
         style={{
@@ -109,7 +109,7 @@ function DashboardNavbar({
           <div className="p-1.5 bg-emerald-500/15 border border-emerald-500/25 rounded-xl text-emerald-400 group-hover:bg-emerald-500/25 group-hover:border-emerald-500/40 transition-all duration-200">
             <Shield className="w-3.5 h-3.5" />
           </div>
-          <span className="text-sm font-black text-white tracking-tight">
+          <span className="text-sm font-black text-slate-900 dark:text-white tracking-tight">
             WitnessChain
           </span>
           <span className="text-[8px] bg-emerald-500/15 border border-emerald-500/25 text-emerald-400 px-1.5 py-0.5 rounded-full font-bold hidden sm:inline tracking-wider">
@@ -120,7 +120,6 @@ function DashboardNavbar({
         {/* Right — Actions */}
         <div className="flex items-center gap-1.5">
           <ThemeToggle />
-
           {user ? (
             <>
               <div className="hidden sm:flex items-center gap-2 px-2.5 py-1.5 bg-slate-800/50 border border-slate-700/50 rounded-xl hover:bg-slate-800/70 transition-all duration-200">
@@ -194,11 +193,14 @@ function DashboardFooter() {
   ];
 
   return (
-    <footer className="relative z-10 bg-slate-900/40 backdrop-blur-md border-t border-slate-800/50">
+    <footer className="mt-auto w-full relative z-10 bg-white/80 dark:bg-slate-900/40 backdrop-blur-md border-t border-slate-200 dark:border-slate-800/50 transition-colors duration-500">
       {/* Top gradient line */}
       <div className="h-px w-full bg-gradient-to-r from-transparent via-emerald-500/30 to-transparent" />
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-12 pb-28" style={{ paddingBottom: 'max(7rem, calc(env(safe-area-inset-bottom) + 5.5rem))' }}>
+      <div
+        className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-12"
+        style={{ paddingBottom: 'max(5.5rem, calc(env(safe-area-inset-bottom) + 4.5rem))' }}
+      >
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-10">
 
           {/* Brand col */}
@@ -408,7 +410,7 @@ export default function DashboardPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-slate-950 flex items-center justify-center" style={{ minHeight: '100dvh' }}>
+      <div className="min-h-dvh bg-slate-50 dark:bg-slate-950 flex items-center justify-center">
         <div className="text-center space-y-4">
           <Spinner size="lg" className="mx-auto text-emerald-500" />
           <p className="text-slate-400 text-sm font-semibold">Memuat Data Dashboard...</p>
@@ -418,7 +420,7 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 font-sans relative flex flex-col" style={{ minHeight: '100dvh' }}>
+    <div className="flex flex-1 flex-col min-h-dvh w-full bg-slate-950 text-slate-100 font-sans relative">
       {/* Background blobs */}
       <div className="fixed top-0 right-0 w-[40%] h-[30%] bg-emerald-950/15 rounded-full blur-[140px] pointer-events-none z-0" />
       <div className="fixed bottom-0 left-0 w-[40%] h-[35%] bg-teal-950/10 rounded-full blur-[140px] pointer-events-none z-0" />
@@ -427,10 +429,10 @@ export default function DashboardPage() {
       <DashboardNavbar user={user} isGuest={isGuest} onLogout={handleLogout} />
 
       {/* ── Main Content — grows to fill space ── */}
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-32 space-y-8 relative z-10">
+      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-8 space-y-8 relative z-10">
 
         {/* Welcome Banner */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 bg-slate-900/40 border border-slate-800/80 backdrop-blur-md p-8 rounded-3xl shadow-xl">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 bg-white dark:bg-slate-900/40 border border-slate-200 dark:border-slate-800/80 backdrop-blur-md p-8 rounded-3xl shadow-xl transition-colors duration-500">
           <div className="space-y-2">
             <h1 className="text-3xl font-extrabold tracking-tight text-white flex items-center gap-2">
               <LayoutDashboard className="w-8 h-8 text-emerald-400" />
@@ -438,7 +440,7 @@ export default function DashboardPage() {
                 ? `Selamat Datang, ${user.user_metadata?.full_name?.split(" ")[0] || user.user_metadata?.name?.split(" ")[0] || "Kembali"}`
                 : "Selamat Datang"}
             </h1>
-            <p className="text-sm text-slate-400 font-medium">
+            <p className="text-sm text-slate-600 dark:text-slate-400 font-medium">
               {user
                 ? "Pantau laporan pelanggaran, draf kelengkapan berkas, dan unduh salinan berkas resmi Anda."
                 : "Anda menggunakan mode tamu. Daftar akun untuk menyimpan kasus secara permanen."}

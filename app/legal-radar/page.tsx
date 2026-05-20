@@ -77,7 +77,8 @@ export default function LegalRadarPage() {
 
   if (!loading && (!caseData || !caseData.description)) {
     return (
-      <div className="max-w-2xl mx-auto px-4 py-12 flex flex-col items-center text-center">
+      <div className="flex-1 min-h-full bg-slate-50 dark:bg-slate-950 flex flex-col items-center justify-center px-4 py-12 text-center">
+      <div className="max-w-2xl w-full flex flex-col items-center">
         <Scale className="w-24 h-24 text-slate-300 mb-6" />
         <h2 className="text-2xl font-bold text-slate-900 mb-2">Belum Ada Kasus untuk Dianalisis</h2>
         <p className="text-slate-600 mb-8 max-w-md">
@@ -87,11 +88,13 @@ export default function LegalRadarPage() {
           Mulai Dokumentasi
         </Button>
       </div>
+      </div>
     );
   }
 
   if (loading) {
     return (
+      <div className="flex-1 min-h-full bg-slate-50 dark:bg-slate-950">
       <div className="max-w-2xl mx-auto px-4 py-8">
         <div className="flex flex-col items-center justify-center py-12 space-y-6">
           <div className="w-12 h-12 border-4 border-emerald-200 border-t-emerald-600 rounded-full animate-spin"></div>
@@ -103,18 +106,21 @@ export default function LegalRadarPage() {
           ))}
         </div>
       </div>
+      </div>
     );
   }
 
   if (error) {
     return (
-      <div className="max-w-2xl mx-auto px-4 py-12 flex flex-col items-center text-center">
+      <div className="flex-1 min-h-full bg-slate-50 dark:bg-slate-950 flex flex-col items-center justify-center px-4 py-12 text-center">
+      <div className="max-w-2xl w-full flex flex-col items-center">
         <AlertTriangle className="w-16 h-16 text-red-500 mb-4" />
         <h2 className="text-xl font-bold text-slate-900 mb-2">Analisis Gagal</h2>
         <p className="text-slate-600 mb-6">{error}</p>
         <Button variant="primary" onClick={() => caseData && fetchAnalysis(caseData)}>
           Coba Lagi
         </Button>
+      </div>
       </div>
     );
   }
@@ -132,7 +138,8 @@ export default function LegalRadarPage() {
     'bg-linear-to-r from-emerald-50 to-emerald-100 border-emerald-200';
 
   return (
-    <div className="max-w-2xl mx-auto px-4 py-6 space-y-6">
+    <div className="flex-1 min-h-full bg-slate-50 dark:bg-slate-950">
+    <div className="max-w-2xl mx-auto px-4 py-6 pb-8 space-y-6">
       
       {/* Card 1: Kekuatan Kasus */}
       <div className={`p-6 rounded-2xl border shadow-sm ${scoreGradient}`}>
@@ -154,7 +161,7 @@ export default function LegalRadarPage() {
 
       {/* Card 2: Pasal yang Dilanggar */}
       <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-        <div className="p-5 border-b border-slate-100 bg-slate-50/50">
+        <div className="p-5 border-b border-slate-100 bg-slate-50 dark:bg-slate-950/50">
           <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
             <Scale className="w-5 h-5 text-emerald-600" />
             Pasal yang Berpotensi Dilanggar
@@ -169,7 +176,7 @@ export default function LegalRadarPage() {
             analysisResult.pasal_dilanggar.map((pasal, idx) => (
               <div key={idx} className="flex flex-col">
                 <button 
-                  className="p-4 flex items-center justify-between hover:bg-slate-50 transition-colors w-full text-left"
+                  className="p-4 flex items-center justify-between hover:bg-slate-50 dark:bg-slate-950 transition-colors w-full text-left"
                   onClick={() => setExpandedPasal(expandedPasal === idx ? null : idx)}
                 >
                   <div className="flex items-center gap-3">
@@ -181,7 +188,7 @@ export default function LegalRadarPage() {
                   {expandedPasal === idx ? <ChevronUp className="w-4 h-4 text-slate-400" /> : <ChevronDown className="w-4 h-4 text-slate-400" />}
                 </button>
                 {expandedPasal === idx && (
-                  <div className="px-4 pb-4 pt-1 bg-slate-50/50 text-sm text-slate-600 leading-relaxed border-t border-slate-100/50">
+                  <div className="px-4 pb-4 pt-1 bg-slate-50 dark:bg-slate-950/50 text-sm text-slate-600 leading-relaxed border-t border-slate-100/50">
                     {pasal.penjelasan}
                   </div>
                 )}
@@ -193,7 +200,7 @@ export default function LegalRadarPage() {
 
       {/* Card 3: Rekomendasi Langkah */}
       <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-        <div className="p-5 border-b border-slate-100 bg-slate-50/50">
+        <div className="p-5 border-b border-slate-100 bg-slate-50 dark:bg-slate-950/50">
           <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
             <CheckCircle className="w-5 h-5 text-emerald-600" />
             Langkah yang Direkomendasikan
@@ -235,7 +242,7 @@ export default function LegalRadarPage() {
       )}
 
       {/* Card 5: Estimasi Timeline */}
-      <div className="bg-slate-50 rounded-2xl border border-slate-200 shadow-sm p-5 flex items-start gap-4">
+      <div className="bg-slate-50 dark:bg-slate-950 rounded-2xl border border-slate-200 shadow-sm p-5 flex items-start gap-4">
         <div className="p-2 bg-slate-200 rounded-lg shrink-0">
           <Clock className="w-5 h-5 text-slate-700" />
         </div>
@@ -253,6 +260,7 @@ export default function LegalRadarPage() {
         </p>
       </div>
 
+    </div>
     </div>
   );
 }

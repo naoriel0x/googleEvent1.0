@@ -419,13 +419,13 @@ export default function InterviewPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col relative font-sans">
+    <div className="flex-1 min-h-full bg-slate-100 dark:bg-slate-950 flex flex-col relative font-sans transition-colors duration-500">
       {/* Toast Alert */}
       {toast && (
-        <div className={`fixed top-6 right-6 z-50 px-5 py-3.5 rounded-2xl shadow-2xl border flex items-center gap-3 transition-all duration-300 transform translate-y-0 animate-slideIn ${
+        <div className={`fixed top-20 right-4 z-50 px-5 py-3.5 rounded-2xl shadow-2xl border flex items-center gap-3 ${
           toast.type === 'success' 
-            ? 'bg-emerald-50 border-emerald-200 text-emerald-800' 
-            : 'bg-red-50 border-red-200 text-red-800'
+            ? 'bg-emerald-50 dark:bg-emerald-950/90 border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-200' 
+            : 'bg-red-50 dark:bg-red-950/90 border-red-200 dark:border-red-800 text-red-800 dark:text-red-200'
         }`}>
           <div className={`p-1 rounded-full ${toast.type === 'success' ? 'bg-emerald-100' : 'bg-red-100'}`}>
             <CheckCircle className="w-5 h-5 shrink-0" />
@@ -435,75 +435,91 @@ export default function InterviewPage() {
       )}
 
 
-      {/* Premium Auth Banner */}
-      <div className="bg-linear-to-r from-slate-950 via-emerald-950 to-slate-950 text-white py-3 px-6 shadow-lg border-b border-emerald-900/50">
-        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-xs sm:text-sm font-medium">
+      {/* Auth banner */}
+      <div className="bg-gradient-to-r from-white via-emerald-50/80 to-slate-50 dark:from-slate-950 dark:via-emerald-950/80 dark:to-slate-950 text-slate-800 dark:text-white py-3 px-4 sm:px-6 border-b border-slate-200/80 dark:border-emerald-900/40 shadow-sm transition-colors duration-500">
+        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3 text-xs sm:text-sm font-medium">
           {user ? (
             <div className="flex items-center gap-2">
-              <div className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></div>
-              <span>Anda masuk sebagai: <strong className="text-emerald-300 font-semibold">{user.email}</strong></span>
+              <span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
+              <span>
+                Masuk sebagai{' '}
+                <strong className="text-emerald-700 dark:text-emerald-300 font-semibold">{user.email}</strong>
+              </span>
             </div>
           ) : (
-            <div className="flex items-center gap-2">
-              <Sparkles className="w-4 h-4 text-emerald-400 animate-pulse shrink-0" />
-              <span>Simpan laporan secara permanen ke akun Anda untuk diunduh kembali nanti.</span>
+            <div className="flex items-center gap-2 text-slate-600 dark:text-slate-300">
+              <Sparkles className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
+              <span>Simpan laporan ke akun agar bisa diakses lagi dari dashboard.</span>
             </div>
           )}
-          
-          <div className="flex items-center gap-4">
+
+          <div className="flex items-center gap-3">
             {user ? (
               <>
-                <Link href="/dashboard" className="text-emerald-300 hover:text-emerald-100 font-bold transition-all underline decoration-emerald-500/50 underline-offset-4 flex items-center gap-1">
-                  Dashboard Kasus <ArrowRight className="w-3.5 h-3.5" />
+                <Link
+                  href="/dashboard"
+                  className="text-emerald-700 dark:text-emerald-300 hover:text-emerald-900 dark:hover:text-emerald-100 font-bold flex items-center gap-1 transition-colors"
+                >
+                  Dashboard <ArrowRight className="w-3.5 h-3.5" />
                 </Link>
                 <button
+                  type="button"
                   onClick={() => supabaseClient.auth.signOut()}
-                  className="text-slate-400 hover:text-white transition-all text-xs border border-slate-700 hover:border-slate-500 px-2 py-0.5 rounded-md"
+                  className="text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white text-xs border border-slate-300 dark:border-slate-600 hover:border-slate-400 dark:hover:border-slate-500 px-2.5 py-1 rounded-lg transition-colors"
                 >
                   Keluar
                 </button>
               </>
             ) : (
-              <div className="flex items-center gap-3">
-                <Link href="/login" className="bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-1.5 px-4 rounded-xl shadow-sm transition-all duration-200">
-                  Masuk / Daftar
-                </Link>
-              </div>
+              <Link
+                href="/login"
+                className="bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-1.5 px-4 rounded-xl shadow-sm transition-colors text-xs sm:text-sm"
+              >
+                Masuk / Daftar
+              </Link>
             )}
           </div>
         </div>
       </div>
 
       {!hasStarted ? (
-        <div className="flex-1 flex items-center justify-center p-6 bg-linear-to-b from-slate-50/50 to-emerald-50/10">
-          <div className="text-center max-w-md w-full p-8 bg-white border border-slate-200/80 rounded-3xl shadow-xl animate-scaleUp">
-            <div className="mx-auto w-16 h-16 bg-emerald-50 border border-emerald-100 rounded-2xl flex items-center justify-center mb-6 shadow-sm">
-              <Shield className="w-8 h-8 text-emerald-600 animate-pulse" />
+        <div className="flex-1 flex items-center justify-center p-6 sm:p-10">
+          <div className="text-center max-w-lg w-full p-8 sm:p-10 bg-white dark:bg-slate-900/80 border border-slate-200/80 dark:border-slate-700/80 rounded-3xl shadow-xl dark:shadow-black/30">
+            <div className="mx-auto w-16 h-16 bg-emerald-500/10 dark:bg-emerald-500/15 border border-emerald-500/20 rounded-2xl flex items-center justify-center mb-6">
+              <Shield className="w-8 h-8 text-emerald-600 dark:text-emerald-400" />
             </div>
-            <h2 className="text-2xl font-extrabold text-slate-900 mb-3 tracking-tight">
-              Selamat datang di WitnessChain
+            <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white mb-3 tracking-tight">
+              Dokumentasi Kasus
             </h2>
-            <p className="text-sm text-slate-500 mb-6 leading-relaxed font-medium">
-              Kami siap membantu Anda mendokumentasikan fakta kasus dengan struktur hukum yang jelas, kredibel, dan profesional secara aman.
+            <p className="text-sm text-slate-600 dark:text-slate-400 mb-8 leading-relaxed">
+              Asisten AI akan menuntun Anda mencatat kronologi, saksi, dan bukti secara terstruktur.
             </p>
             <Button
               variant="primary"
               size="lg"
               onClick={startInterview}
               loading={loading}
-              className="w-full font-bold gap-2 shadow-md hover:shadow-lg transition-all py-3.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white border-0"
+              className="w-full font-bold gap-2 py-3.5 rounded-xl"
             >
-              Mulai Wawancara <ArrowRight className="w-4.5 h-4.5" />
+              Mulai Wawancara <ArrowRight className="w-4 h-4" />
             </Button>
           </div>
         </div>
       ) : (
-        <div className="flex-1 grid grid-cols-1 lg:grid-cols-3 gap-6 p-6 max-w-7xl mx-auto w-full">
-          {/* Chat Area - Main */}
-          <div className="lg:col-span-2 flex flex-col h-[calc(100vh-140px)] bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-            
-            {/* Chat Messages */}
-            <div className="flex-1 overflow-y-auto p-6 space-y-5 bg-linear-to-b from-white to-slate-50 scrollbar-thin">
+        <div className="flex-1 grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 p-4 sm:p-6 max-w-7xl mx-auto w-full pb-6">
+          {/* Chat Area */}
+          <div className="lg:col-span-2 flex flex-col min-h-[min(640px,calc(100dvh-11rem))] lg:h-[calc(100dvh-11rem)] bg-white dark:bg-slate-900/60 rounded-2xl border border-slate-200/90 dark:border-slate-700/80 shadow-sm dark:shadow-black/20 overflow-hidden">
+            <div className="px-4 py-3 border-b border-slate-200/80 dark:border-slate-700/80 bg-slate-50/80 dark:bg-slate-800/40 flex items-center gap-2">
+              <div className="p-1.5 rounded-lg bg-emerald-500/10 border border-emerald-500/20">
+                <Sparkles className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+              </div>
+              <div>
+                <p className="text-sm font-bold text-slate-900 dark:text-white">Sesi Wawancara</p>
+                <p className="text-[10px] text-slate-500 dark:text-slate-400">Jawab pertanyaan atau gunakan tombol aksi cepat di bawah</p>
+              </div>
+            </div>
+
+            <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4 bg-slate-50/50 dark:bg-slate-950/30">
               {messages.map((message, index) => (
                 <ChatBubble
                   key={index}
@@ -516,46 +532,36 @@ export default function InterviewPage() {
               <div ref={messagesEndRef} />
             </div>
 
-            {/* Quick Actions & Input Area */}
-            <div className="border-t border-slate-200 p-4 bg-slate-50/80 backdrop-blur-sm">
-              
-              {/* Quick Actions Container */}
-              <div className="flex flex-wrap gap-2.5 mb-3.5">
-                <button
-                  type="button"
-                  onClick={() => { setInitialFormTab('info'); setShowCaseForm(true); }}
-                  className="px-3.5 py-2 bg-white hover:bg-emerald-50 border border-slate-200 hover:border-emerald-300 text-slate-700 hover:text-emerald-800 rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-sm transition-all duration-200"
-                >
-                  <FileText className="w-3.5 h-3.5 text-emerald-600" />
-                  Isi Formulir Kasus
-                </button>
-                <button
-                  type="button"
-                  onClick={() => { setInitialFormTab('witnesses'); setShowCaseForm(true); }}
-                  className="px-3.5 py-2 bg-white hover:bg-emerald-50 border border-slate-200 hover:border-emerald-300 text-slate-700 hover:text-emerald-800 rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-sm transition-all duration-200"
-                >
-                  <Users className="w-3.5 h-3.5 text-emerald-600" />
-                  Tambah Saksi
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setShowEvidenceUpload(true)}
-                  className="px-3.5 py-2 bg-white hover:bg-emerald-50 border border-slate-200 hover:border-emerald-300 text-slate-700 hover:text-emerald-800 rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-sm transition-all duration-200"
-                >
-                  <Paperclip className="w-3.5 h-3.5 text-emerald-600" />
-                  Unggah Bukti Fisik
-                </button>
+            <div className="border-t border-slate-200/80 dark:border-slate-700/80 p-4 bg-white/90 dark:bg-slate-900/80 backdrop-blur-sm">
+              <p className="text-[10px] font-extrabold text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-2.5">
+                Aksi Cepat
+              </p>
+              <div className="flex flex-wrap gap-2 mb-3">
+                {[
+                  { icon: FileText, label: 'Isi Formulir Kasus', onClick: () => { setInitialFormTab('info'); setShowCaseForm(true); } },
+                  { icon: Users, label: 'Tambah Saksi', onClick: () => { setInitialFormTab('witnesses'); setShowCaseForm(true); } },
+                  { icon: Paperclip, label: 'Unggah Bukti Fisik', onClick: () => setShowEvidenceUpload(true) },
+                ].map(({ icon: Icon, label, onClick }) => (
+                  <button
+                    key={label}
+                    type="button"
+                    onClick={onClick}
+                    className="px-3 py-2 bg-slate-50 dark:bg-slate-800 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 border border-slate-200 dark:border-slate-600 hover:border-emerald-300 dark:hover:border-emerald-700 text-slate-700 dark:text-slate-200 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all"
+                  >
+                    <Icon className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
+                    {label}
+                  </button>
+                ))}
               </div>
 
-              {/* Chat Input */}
-              <form onSubmit={sendMessage} className="flex gap-2.5">
+              <form onSubmit={sendMessage} className="flex gap-2">
                 <input
                   type="text"
                   value={inputValue}
                   onChange={(e) => setInputValue(e.target.value)}
-                  placeholder="Ketik jawaban Anda di sini atau gunakan formulir cepat di atas..."
+                  placeholder="Ketik jawaban Anda..."
                   disabled={loading || aiThinking}
-                  className="flex-1 px-4.5 py-3 border border-slate-200 bg-white rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 disabled:bg-slate-100 disabled:text-slate-400 placeholder-slate-400 transition-all shadow-inner"
+                  className="flex-1 px-4 py-3 border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/60 disabled:opacity-60 placeholder:text-slate-400 dark:placeholder:text-slate-500 transition-all"
                 />
                 <Button
                   type="submit"
@@ -586,10 +592,10 @@ export default function InterviewPage() {
 
             {/* Completeness / Document Generation Banner */}
             {caseData.completeness_score! >= 70 && (
-              <div className="p-5 bg-linear-to-r from-emerald-50 to-teal-50 border border-emerald-200 rounded-2xl shadow-sm transition-all duration-300 transform translate-y-0 scale-100 animate-fadeIn">
-                <div className="flex items-center gap-2 text-emerald-950 mb-3.5">
-                  <CheckCircle className="w-5.5 h-5.5 text-emerald-600 shrink-0" />
-                  <span className="text-sm font-bold">Dokumen Siap Dibuat!</span>
+              <div className="p-5 bg-gradient-to-br from-emerald-50 to-teal-50/50 dark:from-emerald-950/50 dark:to-teal-950/30 border border-emerald-200 dark:border-emerald-800/50 rounded-2xl shadow-sm">
+                <div className="flex items-center gap-2 text-emerald-900 dark:text-emerald-200 mb-3">
+                  <CheckCircle className="w-5 h-5 text-emerald-600 dark:text-emerald-400 shrink-0" />
+                  <span className="text-sm font-bold">Dokumen siap dibuat</span>
                 </div>
                 <Link href={caseData.id ? `/result/${caseData.id}` : '#'} className="block">
                   <Button 
@@ -605,20 +611,18 @@ export default function InterviewPage() {
 
             {/* Redesigned Premium Uploaded Evidence List */}
             {caseData.evidence && caseData.evidence.length > 0 && (
-              <div className="p-5 bg-white border border-slate-200 rounded-2xl shadow-sm space-y-3.5">
-                <div className="flex items-center justify-between border-b border-slate-100 pb-2.5">
-                  <p className="text-sm font-extrabold text-slate-800 flex items-center gap-2">
-                    <Paperclip className="w-4.5 h-4.5 text-emerald-600" />
-                    Bukti Terunggah ({caseData.evidence.length})
-                  </p>
-                </div>
-                <div className="space-y-2.5 max-h-[220px] overflow-y-auto pr-1 scrollbar-thin">
+              <div className="p-5 bg-white dark:bg-slate-900/80 border border-slate-200 dark:border-slate-700 rounded-2xl shadow-sm space-y-3">
+                <p className="text-sm font-extrabold text-slate-800 dark:text-slate-100 flex items-center gap-2 border-b border-slate-100 dark:border-slate-700 pb-2">
+                  <Paperclip className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                  Bukti Terunggah ({caseData.evidence.length})
+                </p>
+                <div className="space-y-2 max-h-[200px] overflow-y-auto pr-1">
                   {caseData.evidence.map((evidence) => (
-                    <div 
-                      key={evidence.id} 
-                      className="flex items-center gap-3 p-3 bg-slate-50/80 border border-slate-100 rounded-xl hover:bg-slate-100 hover:border-slate-200 transition-all duration-200"
+                    <div
+                      key={evidence.id}
+                      className="flex items-center gap-3 p-3 bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-700 rounded-xl hover:border-emerald-300/50 dark:hover:border-emerald-700/50 transition-colors"
                     >
-                      <div className="p-2 bg-emerald-50 rounded-lg text-emerald-600 shrink-0">
+                      <div className="p-2 bg-emerald-500/10 dark:bg-emerald-500/15 rounded-lg text-emerald-600 dark:text-emerald-400 shrink-0">
                         {evidence.type === 'photo' ? (
                           <ImageIcon className="w-4 h-4" />
                         ) : evidence.type === 'video' ? (
@@ -628,15 +632,15 @@ export default function InterviewPage() {
                         )}
                       </div>
                       <div className="min-w-0 flex-1">
-                        <p className="text-xs font-bold text-slate-800 truncate">
+                        <p className="text-xs font-bold text-slate-800 dark:text-slate-100 truncate">
                           {evidence.name || `${evidence.type === 'photo' ? 'Foto' : evidence.type === 'video' ? 'Video' : 'Dokumen'} Kasus`}
                         </p>
                         {evidence.description && (
-                          <p className="text-[10px] text-slate-500 truncate mt-0.5 font-medium italic">
+                          <p className="text-[10px] text-slate-500 dark:text-slate-400 truncate mt-0.5 italic">
                             &ldquo;{evidence.description}&rdquo;
                           </p>
                         )}
-                        <p className="text-[9px] text-slate-400 font-semibold mt-1">
+                        <p className="text-[9px] text-slate-400 dark:text-slate-500 font-semibold mt-1">
                           {new Date(evidence.timestamp).toLocaleDateString('id-ID', {
                             day: 'numeric',
                             month: 'short',
