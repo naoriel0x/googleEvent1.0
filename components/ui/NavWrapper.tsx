@@ -6,22 +6,26 @@ import { BottomNav } from './BottomNav';
 
 export default function NavWrapper({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  
-  // Hide nav on these pages
-  const hideNav = ['/', '/login', /^\/share\//];
-  const shouldHideNav = hideNav.includes(pathname) || hideNav.some(path => typeof path === 'string' ? false : path.test(pathname));
 
-  if (shouldHideNav) {
-    return <>{children}</>;
-  }
+  const hideTopNav = ['/', '/login', '/dashboard', /^\/share\//];
+  const hideBottomNav = ['/', '/login', /^\/share\//];
+
+  const shouldHideTop = hideTopNav.some(p =>
+    typeof p === 'string' ? p === pathname : p.test(pathname)
+  );
+  const shouldHideBottom = hideBottomNav.some(p =>
+    typeof p === 'string' ? p === pathname : p.test(pathname)
+  );
+
+  if (shouldHideTop && shouldHideBottom) return <>{children}</>;
 
   return (
     <>
-      <TopNav />
-      <main className="pt-14 pb-20">
+      {!shouldHideTop && <TopNav />}
+      <main className={`${!shouldHideTop ? 'pt-14' : ''} ${!shouldHideBottom ? 'pb-20' : ''}`}>
         {children}
       </main>
-      <BottomNav />
+      {!shouldHideBottom && <BottomNav />}
     </>
   );
 }
