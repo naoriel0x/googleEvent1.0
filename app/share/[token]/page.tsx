@@ -40,7 +40,7 @@ export default async function SharePage({ params }: { params: { token: string } 
 
   if (!caseData) {
     return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
+      <div className="min-h-dvh bg-slate-50 flex items-center justify-center p-4">
         <div className="bg-white rounded-2xl border border-slate-200 p-8 shadow-xl max-w-md w-full text-center">
           <div className="w-16 h-16 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto mb-4">
             <AlertTriangle className="w-8 h-8" />
@@ -64,7 +64,7 @@ export default async function SharePage({ params }: { params: { token: string } 
   });
 
   return (
-    <div className="min-h-screen bg-slate-50 pb-20">
+    <div className="min-h-dvh bg-slate-50 dark:bg-slate-950 pb-20 transition-colors duration-500">
       {/* Header Banner */}
       <div className="bg-white border-b border-slate-200">
         <div className="max-w-3xl mx-auto px-4 py-6">

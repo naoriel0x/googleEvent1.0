@@ -37,12 +37,12 @@ export function ProgressTracker({
   ];
 
   return (
-    <div className="bg-white rounded-lg border border-slate-200 p-6">
+    <div className="bg-white dark:bg-slate-900/80 rounded-2xl border border-slate-200 dark:border-slate-700 p-6 shadow-sm">
       <div className="flex flex-col items-center gap-4 mb-6">
         <ProgressRing score={score} size={120} isThinking={isThinking} />
         <div className="text-center">
-          <p className="text-sm text-slate-600">Kelengkapan Data</p>
-          <p className="text-xs text-slate-500 mt-1">
+          <p className="text-sm font-bold text-slate-800 dark:text-slate-200">Kelengkapan Data</p>
+          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
             {score < 50
               ? 'Perlu banyak dilengkapi'
               : score < 80
@@ -52,7 +52,7 @@ export function ProgressTracker({
         </div>
       </div>
 
-      <div className="space-y-3 border-t border-slate-200 pt-6">
+      <div className="space-y-3 border-t border-slate-200 dark:border-slate-700 pt-6">
         {items.map((item, index) => (
           <div key={index} className="flex items-center gap-3">
             {item.checked ? (
@@ -78,7 +78,9 @@ export function ProgressTracker({
             )}
             <span
               className={`text-sm ${
-                item.checked ? 'text-slate-900 font-medium' : 'text-slate-500'
+                item.checked
+                  ? 'text-slate-900 dark:text-slate-100 font-medium'
+                  : 'text-slate-500 dark:text-slate-500'
               }`}
             >
               {item.label}

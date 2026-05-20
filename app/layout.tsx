@@ -1,6 +1,9 @@
 import type { Metadata } from 'next';
 import { Plus_Jakarta_Sans, Outfit } from 'next/font/google';
 import './globals.css';
+import NavWrapper from '@/components/ui/NavWrapper';
+import { ThemeScript } from '@/components/ui/ThemeScript';
+import { ThemeProvider } from '@/components/ui/ThemeProvider';
 
 const plusJakartaSans = Plus_Jakarta_Sans({
   subsets: ['latin'],
@@ -15,7 +18,7 @@ const outfit = Outfit({
 export const metadata: Metadata = {
   title: 'WitnessChain — Dokumentasi Bukti Digital',
   description:
-    'Platform dokumentasi bukti digital untuk korban penggusuran, sengketa lahan, dan pelanggaran hak warga Indonesia. Buat dokumen profesional siap dibawa ke LBH atau Komnas HAM.',
+    'Platform dokumentasi bukti digital untuk korban penggusuran, sengketa lahan, dan pelanggaran hak warga Indonesia. Bantu menyusun berkas kasus untuk konsultasi LBH atau lembaga terkait.',
   keywords: [
     'documenter',
     'bukti digital',
@@ -27,21 +30,24 @@ export const metadata: Metadata = {
   ],
 };
 
-import NavWrapper from '@/components/ui/NavWrapper';
-
 export default function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
   return (
-    <html lang="id">
+    <html lang="id" suppressHydrationWarning>
+      <head>
+        <ThemeScript />
+      </head>
       <body
-        className={`${plusJakartaSans.variable} ${outfit.variable} font-sans bg-slate-50 text-slate-900`}
+        className={`${plusJakartaSans.variable} ${outfit.variable} font-sans min-h-dvh text-[var(--text-primary)] bg-[var(--bg-secondary)]`}
       >
-        <div className="min-h-screen flex flex-col">
-          <NavWrapper>{children}</NavWrapper>
-        </div>
+        <ThemeProvider>
+          <div className="min-h-dvh flex flex-col bg-[var(--bg-secondary)]">
+            <NavWrapper>{children}</NavWrapper>
+          </div>
+        </ThemeProvider>
       </body>
     </html>
   );

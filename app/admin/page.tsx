@@ -51,13 +51,13 @@ export default function AdminPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="flex-1 min-h-full bg-slate-50 dark:bg-slate-950 transition-colors duration-500">
 
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Title */}
         <div className="mb-12">
-          <h1 className="font-serif text-4xl font-bold text-slate-900 mb-2">
+          <h1 className="font-serif text-4xl font-bold text-slate-900 dark:text-white mb-2">
             Dashboard Admin
           </h1>
           <p className="text-slate-600">

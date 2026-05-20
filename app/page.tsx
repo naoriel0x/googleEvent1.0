@@ -627,22 +627,22 @@ export default function HomePage() {
   }, []);
 
   return (
-    <>
+    <div className="min-h-dvh bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-white transition-colors duration-500">
       <IntroScreen />
 
       {/* Navigation */}
       <nav
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
           scrolled
-            ? "bg-slate-900/70 backdrop-blur-sm border-b border-slate-800 shadow-lg shadow-black/20"
-            : "bg-slate-950/60 backdrop-blur-sm border-b border-slate-800/40"
+            ? "bg-white/90 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-200/80 dark:border-slate-800 shadow-lg shadow-slate-200/20 dark:shadow-black/20"
+            : "bg-slate-50/80 dark:bg-slate-950/70 backdrop-blur-md border-b border-slate-200/50 dark:border-slate-800/40"
         } min-h-[70px]`}
       >
         <div className="w-full px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between min-h-[70px]">
           {/* Logo — kiri mepet */}
           <button
             onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-            className="text-xl font-bold text-white flex items-center gap-2 cursor-pointer flex-shrink-0"
+            className="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2 cursor-pointer flex-shrink-0"
           >
             <div className="p-1 bg-emerald-950 rounded text-emerald-400">
               <Shield className="w-5 h-5" />
@@ -664,7 +664,7 @@ export default function HomePage() {
                     .getElementById(item.id)
                     ?.scrollIntoView({ behavior: "smooth" })
                 }
-                className="text-slate-300 hover:text-white transition-colors font-medium text-sm cursor-pointer"
+                className="text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-colors font-medium text-sm cursor-pointer"
               >
                 {item.label}
               </button>
@@ -752,7 +752,7 @@ export default function HomePage() {
       </nav>
 
       {/* ── Hero ── */}
-      <section className="bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 pt-32 px-4 pb-24 relative overflow-hidden">
+      <section className="bg-gradient-to-br from-slate-100 via-white to-emerald-50/40 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 pt-32 px-4 pb-24 relative overflow-hidden transition-colors duration-500">
         {/* Mesh background */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           <div className="absolute -top-40 -left-40 w-96 h-96 bg-emerald-600/10 rounded-full blur-[120px]" />
@@ -771,31 +771,31 @@ export default function HomePage() {
           <div className="flex justify-center mb-8">
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-950/60 border border-emerald-700/40 backdrop-blur-sm">
               <span className="text-emerald-300 text-sm font-medium">
-                ✦ Gratis · Tanpa Registrasi · 100% Aman
+                ✦ Gratis · Bisa tanpa akun · Data tersimpan aman
               </span>
             </div>
           </div>
 
           <div className="text-center mb-6">
             <h1 className="text-5xl md:text-7xl font-black leading-tight mb-4">
-              <span className="bg-gradient-to-r from-white via-slate-200 to-slate-400 bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-slate-900 via-slate-700 to-slate-600 dark:from-white dark:via-slate-200 dark:to-slate-400 bg-clip-text text-transparent">
                 Ceritamu penting.
               </span>
               <br />
-              <span className="bg-gradient-to-r from-slate-100 to-slate-300 bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-slate-800 to-slate-600 dark:from-slate-100 dark:to-slate-300 bg-clip-text text-transparent">
                 Kami bantu dokumentasikan
               </span>
               <br />
-              <span className="bg-gradient-to-r from-emerald-400 to-emerald-300 bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-emerald-600 to-emerald-500 dark:from-emerald-400 dark:to-emerald-300 bg-clip-text text-transparent">
                 dengan benar.
               </span>
             </h1>
           </div>
 
-          <p className="text-center max-w-2xl mx-auto text-lg md:text-xl text-slate-400 mb-12 leading-relaxed">
+          <p className="text-center max-w-2xl mx-auto text-lg md:text-xl text-slate-600 dark:text-slate-400 mb-12 leading-relaxed">
             WitnessChain membantu korban penggusuran, sengketa lahan, dan
-            pelanggaran hak mendokumentasikan bukti secara terstruktur — siap
-            dibawa ke LBH atau Polri.
+            pelanggaran hak mendokumentasikan bukti secara terstruktur — untuk
+            dibawa ke LBH atau lembaga terkait.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-16">
@@ -810,7 +810,7 @@ export default function HomePage() {
                   .getElementById("how-it-works")
                   ?.scrollIntoView({ behavior: "smooth" })
               }
-              className="px-8 py-4 border border-slate-600 text-slate-300 font-bold text-base rounded-full hover:bg-slate-800 transition-colors"
+              className="px-8 py-4 border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-300 font-bold text-base rounded-full hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors"
             >
               Pelajari Cara Kerja
             </button>
@@ -859,7 +859,7 @@ export default function HomePage() {
       {/* ── Stats ── */}
       <section className="relative border-y border-slate-800 py-16 px-4 overflow-hidden">
         {/* Rich background */}
-        <div className="absolute inset-0 bg-slate-900" />
+        <div className="absolute inset-0 bg-slate-100 dark:bg-slate-900 transition-colors duration-500" />
         <div className="absolute inset-0 bg-gradient-to-r from-emerald-950/50 via-transparent to-teal-950/30 pointer-events-none" />
         <div className="absolute top-0 left-1/4 w-64 h-64 bg-emerald-600/6 rounded-full blur-[80px] pointer-events-none" />
         <div className="absolute bottom-0 right-1/4 w-48 h-48 bg-teal-500/6 rounded-full blur-[60px] pointer-events-none" />
@@ -882,8 +882,8 @@ export default function HomePage() {
             },
             {
               icon: <FileText className="w-8 h-8 text-emerald-400" />,
-              value: "100%",
-              label: "Gratis, tanpa registrasi, tanpa syarat",
+              value: "Gratis",
+              label: "Tanpa biaya untuk memulai dokumentasi",
             },
             {
               icon: <Users className="w-8 h-8 text-emerald-400" />,
@@ -896,7 +896,7 @@ export default function HomePage() {
               <p className="text-3xl md:text-4xl font-black text-emerald-400 mb-2">
                 {s.value}
               </p>
-              <p className="text-slate-400 text-sm font-medium">{s.label}</p>
+              <p className="text-slate-600 dark:text-slate-400 text-sm font-medium">{s.label}</p>
             </div>
           ))}
         </div>
@@ -907,16 +907,16 @@ export default function HomePage() {
         id="how-it-works"
         className="relative py-24 px-4 overflow-hidden"
       >
-        <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-slate-900 to-slate-950" />
+        <div className="absolute inset-0 bg-gradient-to-br from-slate-100 via-slate-50 to-white dark:from-slate-900 dark:via-slate-900 dark:to-slate-950 transition-colors duration-500" />
         <div className="absolute top-0 right-0 w-96 h-96 bg-emerald-600/5 rounded-full blur-[100px] pointer-events-none" />
         <div className="absolute bottom-0 left-0 w-64 h-64 bg-teal-500/5 rounded-full blur-[80px] pointer-events-none" />
         <div className="relative z-10 max-w-6xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-black text-white mb-4">
-              Tiga langkah menuju dokumen yang kuat
+            <h2 className="text-4xl md:text-5xl font-black text-slate-900 dark:text-white mb-4">
+              Tiga langkah menyusun dokumentasi
             </h2>
-            <p className="text-slate-400 text-lg max-w-2xl mx-auto">
-              Dari cerita menjadi dokumen terstruktur siap hukum dalam 30 menit
+            <p className="text-slate-600 dark:text-slate-400 text-lg max-w-2xl mx-auto">
+              Dari cerita menjadi ringkasan terstruktur yang lebih mudah dibaca LBH
             </p>
           </div>
 
@@ -926,33 +926,33 @@ export default function HomePage() {
                 num: "01",
                 icon: <MessageSquare className="w-6 h-6 text-emerald-400" />,
                 title: "Ceritakan Kejadian",
-                desc: "AI kami mewawancaraimu dengan pertanyaan terstruktur yang digunakan investigator dan paralegal. Ceritakan kronologi secara natural, AI kami pandu langkah demi langkah.",
+                desc: "Asisten AI mengajukan pertanyaan terstruktur agar kronologi, lokasi, dan pihak terlibat tercatat rapi. Ceritakan kejadian dengan bahasa Anda sendiri.",
               },
               {
                 num: "02",
                 icon: <Upload className="w-6 h-6 text-emerald-400" />,
                 title: "Upload Bukti",
-                desc: "Foto, video, dokumen — tersimpan dengan timestamp dan SHA-256 hash. Setiap bukti terlindungi dari manipulasi dan memiliki jejak digital yang jelas.",
+                desc: "Foto, video, dan dokumen dicatat dengan waktu unggah serta hash SHA-256 sebagai referensi integritas berkas.",
               },
               {
                 num: "03",
                 icon: <CheckCircle className="w-6 h-6 text-emerald-400" />,
                 title: "Dapatkan Dokumen",
-                desc: "PDF terstruktur dengan kronologi, referensi pasal hukum, dan daftar saksi — dirancang untuk memudahkan LBH, Komnas HAM, atau Polri memproses kasusmu.",
+                desc: "Unduh ringkasan PDF berisi kronologi, daftar saksi, dan bukti — sebagai bahan awal saat konsultasi ke LBH atau lembaga terkait.",
               },
             ].map((step, idx) => (
               <div
                 key={idx}
-                className="bg-slate-800/60 backdrop-blur-sm border border-slate-700/60 rounded-2xl p-8 hover:border-emerald-500/40 hover:shadow-lg hover:shadow-emerald-900/20 transition-all"
+                className="bg-white/90 dark:bg-slate-800/60 backdrop-blur-sm border border-slate-200 dark:border-slate-700/60 rounded-2xl p-8 hover:border-emerald-500/40 hover:shadow-lg transition-all"
               >
                 <p className="text-8xl font-black text-emerald-900/20 mb-2">
                   {step.num}
                 </p>
                 <div className="flex items-center gap-3 mb-4">
                   {step.icon}
-                  <h3 className="text-xl font-bold text-white">{step.title}</h3>
+                  <h3 className="text-xl font-bold text-slate-900 dark:text-white">{step.title}</h3>
                 </div>
-                <p className="text-slate-400 text-sm leading-relaxed">
+                <p className="text-slate-600 dark:text-slate-400 text-sm leading-relaxed">
                   {step.desc}
                 </p>
               </div>
@@ -963,7 +963,7 @@ export default function HomePage() {
 
       {/* ── Features ── */}
       <section id="features" className="relative py-24 px-4 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950" />
+        <div className="absolute inset-0 bg-gradient-to-br from-slate-50 via-white to-slate-100 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 transition-colors duration-500" />
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(16,185,129,0.06),transparent_60%)] pointer-events-none" />
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,rgba(20,184,166,0.05),transparent_60%)] pointer-events-none" />
         {/* Grid texture */}
@@ -982,10 +982,10 @@ export default function HomePage() {
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-950/60 border border-emerald-800/50 text-emerald-300 text-sm font-medium mb-4">
                 Mengapa WitnessChain?
               </div>
-              <h2 className="text-4xl md:text-5xl font-black text-white mb-6 leading-tight">
+              <h2 className="text-4xl md:text-5xl font-black text-slate-900 dark:text-white mb-6 leading-tight">
                 Dokumentasi yang dirancang untuk keperluan hukum
               </h2>
-              <p className="text-slate-400 text-sm mb-8 leading-relaxed">
+              <p className="text-slate-600 dark:text-slate-400 text-sm mb-8 leading-relaxed">
                 WitnessChain bukan pengganti pengacara — tapi alat yang membantu
                 warga menyiapkan dokumentasi yang lebih kuat sebelum bertemu LBH
                 atau Polri.
@@ -1001,24 +1001,24 @@ export default function HomePage() {
                   {
                     icon: <Scale className="w-6 h-6 text-emerald-400" />,
                     title: "Legal Radar AI",
-                    desc: "Identifikasi pasal hukum yang potentially relevan dengan kasusmu secara otomatis",
+                    desc: "Membantu menandai pasal hukum yang mungkin relevan — bukan penilaian hukum yang mengikat",
                   },
                   {
                     icon: <Lock className="w-6 h-6 text-emerald-400" />,
                     title: "Timestamp & Hash Terkunci",
-                    desc: "Setiap bukti yang diupload memiliki timestamp dan hash yang tidak bisa dimanipulasi",
+                    desc: "Setiap unggahan mendapat cap waktu dan hash sebagai catatan referensi di berkas kasus",
                   },
                   {
                     icon: <MapPin className="w-6 h-6 text-emerald-400" />,
                     title: "Referral LBH Terdekat",
-                    desc: "Terhubung langsung ke Lembaga Bantuan Hukum yang bisa membantu kasusmu",
+                    desc: "Daftar LBH di berbagai kota beserta kontak dan spesialisasi kasus",
                   },
                 ].map((feature, idx) => (
                   <div key={idx} className="flex gap-4">
                     <div className="flex-shrink-0 mt-1">{feature.icon}</div>
                     <div>
-                      <h3 className="font-bold text-white">{feature.title}</h3>
-                      <p className="text-slate-400 text-sm">{feature.desc}</p>
+                      <h3 className="font-bold text-slate-900 dark:text-white">{feature.title}</h3>
+                      <p className="text-slate-600 dark:text-slate-400 text-sm">{feature.desc}</p>
                     </div>
                   </div>
                 ))}
@@ -1041,14 +1041,14 @@ export default function HomePage() {
 
       {/* ── Why ── */}
       <section id="why" className="relative py-24 px-4 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-emerald-950 via-slate-950 to-slate-900" />
+        <div className="absolute inset-0 bg-gradient-to-br from-emerald-50 via-slate-50 to-white dark:from-emerald-950 dark:via-slate-950 dark:to-slate-900 transition-colors duration-500" />
         <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-emerald-800/40 to-transparent" />
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(16,185,129,0.05),transparent_70%)] pointer-events-none" />
         <div className="relative z-10 max-w-6xl mx-auto text-center">
-          <h2 className="text-4xl md:text-5xl font-black mb-4 text-white">
+          <h2 className="text-4xl md:text-5xl font-black mb-4 text-slate-900 dark:text-white">
             Kenapa dokumentasi itu penting?
           </h2>
-          <p className="text-slate-400 text-lg max-w-2xl mx-auto mb-16">
+          <p className="text-slate-600 dark:text-slate-400 text-lg max-w-2xl mx-auto mb-16">
             Banyak kasus pelanggaran hak warga tidak bisa diproses bukan karena
             tidak ada bukti — tapi karena bukti tidak terstruktur dan tidak tahu
             cara menyajikannya secara hukum.
@@ -1069,20 +1069,20 @@ export default function HomePage() {
               {
                 icon: <Shield className="w-6 h-6 text-emerald-400" />,
                 title: "Akses Setara",
-                desc: "Selama ini dokumentasi hukum yang baik hanya bisa dibuat dengan bantuan pengacara. WitnessChain membuat ini bisa diakses semua warga.",
+                desc: "WitnessChain membantu warga menyusun catatan awal sebelum bertemu LBH atau pendamping hukum.",
               },
             ].map((card, i) => (
               <div
                 key={i}
-                className="bg-slate-800/50 border border-slate-700 rounded-2xl p-8 text-left"
+                className="bg-white/90 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-2xl p-8 text-left shadow-sm"
               >
                 <div className="w-12 h-12 bg-emerald-900/50 rounded-xl flex items-center justify-center mb-4">
                   {card.icon}
                 </div>
-                <h3 className="font-bold text-white text-lg mb-2">
+                <h3 className="font-bold text-slate-900 dark:text-white text-lg mb-2">
                   {card.title}
                 </h3>
-                <p className="text-slate-400 text-sm leading-relaxed">
+                <p className="text-slate-600 dark:text-slate-400 text-sm leading-relaxed">
                   {card.desc}
                 </p>
               </div>
@@ -1110,7 +1110,7 @@ export default function HomePage() {
         <div className="max-w-2xl mx-auto text-center relative z-10">
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/15 border border-white/25 text-white/90 text-sm font-medium mb-6 backdrop-blur-sm">
             <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
-            Mulai sekarang — gratis selamanya
+            Mulai sekarang — gratis untuk digunakan
           </div>
 
           <h2 className="text-4xl md:text-5xl font-black mb-4 leading-tight">
@@ -1119,7 +1119,7 @@ export default function HomePage() {
             Dokumentasikan sekarang.
           </h2>
           <p className="text-lg text-emerald-50/90 mb-10">
-            Every detail yang terlupakan adalah bukti yang hilang.
+            Semakin cepat dicatat, semakin sedikit detail yang terlewat.
           </p>
 
           {/* HIGH CONTRAST CTA button — dark on light */}
@@ -1139,7 +1139,7 @@ export default function HomePage() {
       </section>
 
       {/* ── Footer ── */}
-      <footer className="bg-slate-950 text-slate-400 border-t border-slate-800/50">
+      <footer className="bg-slate-100 dark:bg-slate-950 text-slate-600 dark:text-slate-400 border-t border-slate-200 dark:border-slate-800/50 transition-colors duration-500">
         <div className="max-w-6xl mx-auto px-4 py-16">
           <div className="grid grid-cols-1 md:grid-cols-6 gap-12">
             {/* Brand */}
@@ -1333,6 +1333,6 @@ export default function HomePage() {
           </div>
         </div>
       </footer>
-    </>
+    </div>
   );
 }

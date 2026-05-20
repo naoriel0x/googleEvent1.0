@@ -10,6 +10,7 @@ import {
   Shield, AlertCircle, Mail, Lock,
   Eye, EyeOff, CheckCircle2, Check, ArrowLeft,
 } from 'lucide-react';
+import { ThemeToggle } from '@/components/ui/ThemeToggle';
 
 // ─── Social button icons (inline SVG — no extra deps) ─────────────────────────
 function GoogleIcon() {
@@ -239,10 +240,13 @@ function LoginComponent() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 flex">
+    <div className="min-h-dvh bg-slate-50 dark:bg-slate-950 flex relative">
+      <div className="absolute top-4 right-4 z-20">
+        <ThemeToggle />
+      </div>
 
       {/* ── Left Side — Visual (Desktop) ── */}
-      <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-emerald-950 via-slate-950 to-slate-900 p-12 flex-col justify-between relative overflow-hidden">
+      <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-emerald-100 via-slate-100 to-white dark:from-emerald-950 dark:via-slate-950 dark:to-slate-900 p-12 flex-col justify-between relative overflow-hidden transition-colors duration-500">
         <div className="absolute top-1/4 right-1/4 w-96 h-96 bg-emerald-600/10 rounded-full blur-3xl pointer-events-none" />
         <div className="absolute bottom-1/4 left-1/4 w-96 h-96 bg-slate-600/10 rounded-full blur-3xl pointer-events-none" />
 
@@ -256,36 +260,36 @@ function LoginComponent() {
             <div className="p-3 bg-emerald-500/20 border border-emerald-500/30 rounded-full">
               <Shield className="w-6 h-6 text-emerald-400" />
             </div>
-            <h1 className="text-2xl font-black text-white">WitnessChain</h1>
+            <h1 className="text-2xl font-black text-slate-900 dark:text-white">WitnessChain</h1>
           </Link>
 
-          <h2 className="text-5xl font-black text-white mb-6 leading-tight">
+          <h2 className="text-5xl font-black text-slate-900 dark:text-white mb-6 leading-tight">
             Setiap dokumentasi adalah langkah menuju keadilan
           </h2>
 
           <div className="space-y-4">
             {[
-              'Dokumentasi terstruktur dan kredibel',
-              'Bukti terlindungi dengan hash encryption',
-              'Siap diajukan ke LBH dan Polri',
+              'Dokumentasi terstruktur dan mudah dilanjutkan',
+              'Bukti dicatat dengan hash SHA-256 sebagai referensi',
+              'Berkas siap dibawa saat konsultasi ke LBH',
             ].map((feature, idx) => (
               <div key={idx} className="flex items-center gap-3">
                 <Check className="w-5 h-5 text-emerald-400 flex-shrink-0" />
-                <span className="text-slate-300">{feature}</span>
+                <span className="text-slate-600 dark:text-slate-300">{feature}</span>
               </div>
             ))}
           </div>
         </div>
 
         <div className="relative z-10">
-          <p className="text-slate-400 text-sm">
-            Dipercaya oleh 1.200+ warga Indonesia untuk menjaga hak mereka
+          <p className="text-slate-500 dark:text-slate-400 text-sm">
+            Dibuat untuk membantu warga menyusun dokumentasi kasus secara mandiri
           </p>
         </div>
       </div>
 
       {/* ── Right Side — Form ── */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-6 sm:p-12 bg-slate-950">
+      <div className="w-full lg:w-1/2 flex items-center justify-center p-6 sm:p-12 bg-white dark:bg-slate-950 transition-colors duration-500">
         <div className="w-full max-w-sm">
 
           {/* Mobile: logo + back button */}
@@ -294,7 +298,7 @@ function LoginComponent() {
               <div className="p-2 bg-emerald-950 rounded">
                 <Shield className="w-5 h-5 text-emerald-400" />
               </div>
-              <span className="font-bold text-white">WitnessChain</span>
+              <span className="font-bold text-slate-900 dark:text-white">WitnessChain</span>
             </Link>
             <BackButton />
           </div>
@@ -304,10 +308,10 @@ function LoginComponent() {
 
           {/* Form Header */}
           <div className="mb-8">
-            <h1 className="text-3xl font-black text-white mb-2">
+            <h1 className="text-3xl font-black text-slate-900 dark:text-white mb-2">
               {isSignUp ? 'Buat Akun' : 'Masuk'}
             </h1>
-            <p className="text-slate-400 text-sm">
+            <p className="text-slate-600 dark:text-slate-400 text-sm">
               {isSignUp
                 ? 'Simpan berkas kasus dan riwayat dokumentasi Anda dengan aman.'
                 : 'Kelola draf kasus dan pantau riwayat dokumen Anda.'}
@@ -315,7 +319,7 @@ function LoginComponent() {
           </div>
 
           {/* Tabs */}
-          <div className="flex gap-1 mb-8 bg-slate-900 border border-slate-800 p-1 rounded-lg">
+          <div className="flex gap-1 mb-8 bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-1 rounded-lg">
             {[
               { label: 'Masuk', value: false },
               { label: 'Daftar', value: true },
@@ -325,8 +329,8 @@ function LoginComponent() {
                 onClick={() => { setIsSignUp(value); setError(null); setSuccess(null); }}
                 className={`flex-1 py-2 px-4 font-bold text-sm rounded-md transition-all ${
                   isSignUp === value
-                    ? 'bg-slate-800 text-white shadow-sm'
-                    : 'text-slate-500 hover:text-slate-300'
+                    ? 'bg-white dark:bg-slate-800 text-slate-900 dark:text-white shadow-sm'
+                    : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'
                 }`}
               >
                 {label}
@@ -339,9 +343,9 @@ function LoginComponent() {
             <>
               <SocialLoginButtons />
               <div className="flex items-center gap-3 my-5">
-                <div className="flex-1 h-px bg-slate-800" />
+                <div className="flex-1 h-px bg-slate-200 dark:bg-slate-800" />
                 <span className="text-xs text-slate-600 font-medium">atau dengan email</span>
-                <div className="flex-1 h-px bg-slate-800" />
+                <div className="flex-1 h-px bg-slate-200 dark:bg-slate-800" />
               </div>
             </>
           )}
@@ -366,20 +370,20 @@ function LoginComponent() {
             {/* Name (Sign Up only) */}
             {isSignUp && (
               <div>
-                <label className="block text-sm font-bold text-white mb-2">Nama Lengkap</label>
+                <label className="block text-sm font-bold text-slate-900 dark:text-white mb-2">Nama Lengkap</label>
                 <input
                   type="text"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   placeholder="John Doe"
-                  className="w-full px-4 py-3 border border-slate-700 rounded-lg focus:outline-none focus:border-emerald-500 bg-slate-900 text-white placeholder-slate-500"
+                  className="w-full px-4 py-3 border border-slate-300 dark:border-slate-700 rounded-lg focus:outline-none focus:border-emerald-500 bg-white dark:bg-slate-900 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500"
                 />
               </div>
             )}
 
             {/* Email */}
             <div>
-              <label className="block text-sm font-bold text-white mb-2">Email</label>
+              <label className="block text-sm font-bold text-slate-900 dark:text-white mb-2">Email</label>
               <div className="relative">
                 <Mail className="absolute left-3 top-3.5 w-5 h-5 text-slate-500" />
                 <input
@@ -387,14 +391,14 @@ function LoginComponent() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="your@email.com"
-                  className="w-full pl-10 pr-4 py-3 border border-slate-700 rounded-lg focus:outline-none focus:border-emerald-500 bg-slate-900 text-white placeholder-slate-500"
+                  className="w-full pl-10 pr-4 py-3 border border-slate-300 dark:border-slate-700 rounded-lg focus:outline-none focus:border-emerald-500 bg-white dark:bg-slate-900 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500"
                 />
               </div>
             </div>
 
             {/* Password */}
             <div>
-              <label className="block text-sm font-bold text-white mb-2">Password</label>
+              <label className="block text-sm font-bold text-slate-900 dark:text-white mb-2">Password</label>
               <div className="relative">
                 <Lock className="absolute left-3 top-3.5 w-5 h-5 text-slate-500" />
                 <input
@@ -402,7 +406,7 @@ function LoginComponent() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
-                  className="w-full pl-10 pr-10 py-3 border border-slate-700 rounded-lg focus:outline-none focus:border-emerald-500 bg-slate-900 text-white placeholder-slate-500"
+                  className="w-full pl-10 pr-10 py-3 border border-slate-300 dark:border-slate-700 rounded-lg focus:outline-none focus:border-emerald-500 bg-white dark:bg-slate-900 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500"
                 />
                 <button
                   type="button"
@@ -417,7 +421,7 @@ function LoginComponent() {
               {isSignUp && (
                 <div className="mt-2">
                   <div className="flex items-center gap-2 mb-1">
-                    <div className="flex-1 h-1.5 bg-slate-800 rounded-full overflow-hidden">
+                    <div className="flex-1 h-1.5 bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden">
                       <div
                         className={`h-full ${passwordStrength.color} transition-all duration-300`}
                         style={{ width: `${(passwordStrength.strength / 4) * 100}%` }}
@@ -433,7 +437,7 @@ function LoginComponent() {
             {/* Confirm Password (Sign Up) */}
             {isSignUp && (
               <div>
-                <label className="block text-sm font-bold text-white mb-2">Konfirmasi Password</label>
+                <label className="block text-sm font-bold text-slate-900 dark:text-white mb-2">Konfirmasi Password</label>
                 <div className="relative">
                   <Lock className="absolute left-3 top-3.5 w-5 h-5 text-slate-500" />
                   <input
@@ -441,7 +445,7 @@ function LoginComponent() {
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     placeholder="••••••••"
-                    className="w-full pl-10 pr-4 py-3 border border-slate-700 rounded-lg focus:outline-none focus:border-emerald-500 bg-slate-900 text-white placeholder-slate-500"
+                    className="w-full pl-10 pr-4 py-3 border border-slate-300 dark:border-slate-700 rounded-lg focus:outline-none focus:border-emerald-500 bg-white dark:bg-slate-900 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500"
                   />
                 </div>
               </div>
@@ -498,14 +502,14 @@ function LoginComponent() {
           {!isSignUp && (
             <>
               <div className="flex items-center gap-3 my-5">
-                <div className="flex-1 h-px bg-slate-800" />
+                <div className="flex-1 h-px bg-slate-200 dark:bg-slate-800" />
                 <span className="text-xs text-slate-600">atau</span>
-                <div className="flex-1 h-px bg-slate-800" />
+                <div className="flex-1 h-px bg-slate-200 dark:bg-slate-800" />
               </div>
               <button
                 type="button"
                 onClick={handleGuestContinue}
-                className="w-full py-3 border border-slate-700 text-slate-400 font-semibold rounded-lg hover:bg-slate-900 hover:text-slate-200 hover:border-slate-600 transition-all text-sm"
+                className="w-full py-3 border border-slate-300 dark:border-slate-700 text-slate-600 dark:text-slate-400 font-semibold rounded-lg hover:bg-slate-100 dark:hover:bg-slate-900 hover:text-slate-900 dark:hover:text-slate-200 transition-all text-sm"
               >
                 Lanjutkan tanpa akun →
               </button>
@@ -521,7 +525,7 @@ function LoginComponent() {
 export default function LoginPage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen bg-slate-950 flex items-center justify-center">
+      <div className="min-h-dvh bg-slate-50 dark:bg-slate-950 flex items-center justify-center">
         <Spinner size="lg" />
       </div>
     }>
