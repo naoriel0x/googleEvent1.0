@@ -90,7 +90,7 @@ export default function ResultIndexPage() {
 
   if (loading) {
     return (
-      <div className="flex-1 min-h-full bg-slate-50 dark:bg-slate-950 flex items-center justify-center">
+      <div className="min-h-dvh bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-white flex items-center justify-center">
         <div className="text-center space-y-4">
           <Spinner size="lg" className="mx-auto text-emerald-600" />
           <p className="text-sm font-semibold text-slate-500">Memuat hasil dokumentasi...</p>
@@ -101,7 +101,7 @@ export default function ResultIndexPage() {
 
   if (cases.length === 0) {
     return (
-      <div className="flex-1 min-h-full bg-slate-50 dark:bg-slate-950">
+      <div className="min-h-dvh bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-white">
         <main className="max-w-lg mx-auto px-4 pt-8 pb-12 flex flex-col items-center text-center">
           <div className="w-20 h-20 rounded-2xl bg-emerald-50 border border-emerald-100 flex items-center justify-center mb-6">
             <ClipboardList className="w-10 h-10 text-emerald-500" />
@@ -131,7 +131,7 @@ export default function ResultIndexPage() {
   }
 
   return (
-    <div className="flex-1 min-h-full bg-slate-50 dark:bg-slate-950">
+    <div className="min-h-dvh bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-white">
       <main className="max-w-2xl mx-auto px-4 sm:px-6 pt-6 pb-12 space-y-6">
         <div>
           <h1 className="text-2xl font-extrabold text-slate-900 dark:text-white">Hasil Dokumentasi</h1>

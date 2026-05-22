@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { supabaseClient } from "@/lib/supabase";
 import { Button } from "@/components/ui/Button";
-import { ThemeToggle } from "@/components/ui/ThemeToggle";
 import { Spinner } from "@/components/ui/Spinner";
 import type { Case } from "@/types";
 import {
@@ -105,21 +104,20 @@ function DashboardNavbar({
         }}
       >
         {/* Left — Logo */}
-        <Link href="/" className="flex items-center gap-2 flex-shrink-0 group">
-          <div className="p-1.5 bg-emerald-500/15 border border-emerald-500/25 rounded-xl text-emerald-400 group-hover:bg-emerald-500/25 group-hover:border-emerald-500/40 transition-all duration-200">
-            <Shield className="w-3.5 h-3.5" />
+        <Link href="/dashboard" className="flex items-center gap-2 flex-shrink-0 group cursor-pointer">
+          <div className="p-1.5 bg-emerald-500/15 border border-emerald-500/25 rounded-xl text-emerald-500 dark:text-emerald-400 group-hover:bg-emerald-500/25 group-hover:border-emerald-500/40 group-hover:scale-105 transition-all duration-300">
+            <Shield className="w-4 h-4" />
           </div>
-          <span className="text-sm font-black text-slate-900 dark:text-white tracking-tight">
+          <span className="text-sm font-black text-slate-900 dark:text-white tracking-tight group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors duration-300">
             WitnessChain
           </span>
-          <span className="text-[8px] bg-emerald-500/15 border border-emerald-500/25 text-emerald-400 px-1.5 py-0.5 rounded-full font-bold hidden sm:inline tracking-wider">
+          <span className="text-[8px] bg-emerald-500/15 border border-emerald-500/25 text-emerald-600 dark:text-emerald-400 px-1.5 py-0.5 rounded-full font-bold hidden sm:inline tracking-wider">
             DASHBOARD
           </span>
         </Link>
 
         {/* Right — Actions */}
-        <div className="flex items-center gap-1.5">
-          <ThemeToggle />
+          <div className="flex items-center gap-1.5">
           {user ? (
             <>
               <div className="hidden sm:flex items-center gap-2 px-2.5 py-1.5 bg-slate-800/50 border border-slate-700/50 rounded-xl hover:bg-slate-800/70 transition-all duration-200">
@@ -144,7 +142,7 @@ function DashboardNavbar({
                   Masuk
                 </button>
               </Link>
-              <Link href="/login?tab=register">
+              <Link href="/login?tab=register" onClick={() => sessionStorage.setItem('wc_prev_path', window.location.pathname)}>
                 <button className="px-3 py-1.5 text-[11px] font-bold text-white bg-emerald-600 hover:bg-emerald-500 rounded-xl transition-all duration-200 shadow-lg shadow-emerald-900/50 hover:shadow-emerald-700/40">
                   Daftar
                 </button>
@@ -224,7 +222,7 @@ function DashboardFooter() {
             <div className="flex items-center gap-2 pt-1">
               {socialLinks.map((s) => (
                 <a key={s.label} href={s.href} aria-label={s.label}
-                  className="w-7 h-7 flex items-center justify-center rounded-lg bg-slate-800/60 border border-slate-700/60 text-slate-500 hover:text-emerald-400 hover:border-emerald-500/30 hover:bg-emerald-500/5 transition-all duration-200">
+                  className="w-7 h-7 flex items-center justify-center rounded-lg bg-slate-800/60 border border-slate-700/60 text-slate-500 hover:text-emerald-400 hover:border-emerald-500/30 hover:bg-emerald-500/10 hover:-translate-y-0.5 cursor-pointer transition-all duration-200">
                   <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
                     <path d={s.path} />
                   </svg>
@@ -240,7 +238,7 @@ function DashboardFooter() {
               {platformLinks.map((link) => (
                 <li key={link.href}>
                   <Link href={link.href}
-                    className="text-xs text-slate-500 hover:text-emerald-400 font-medium transition-colors duration-150 flex items-center gap-2 group">
+                    className="text-xs text-slate-500 hover:text-emerald-400 font-medium transition-all duration-200 flex items-center gap-2 group hover:translate-x-1 cursor-pointer">
                     <span className="w-1 h-1 rounded-full bg-slate-700 group-hover:bg-emerald-500 group-hover:shadow-[0_0_6px_rgba(16,185,129,0.6)] transition-all duration-200 flex-shrink-0" />
                     {link.label}
                   </Link>
@@ -256,7 +254,7 @@ function DashboardFooter() {
               {sitemapLinks.map((link) => (
                 <li key={link.href}>
                   <Link href={link.href}
-                    className="text-xs text-slate-500 hover:text-emerald-400 font-medium transition-colors duration-150 flex items-center gap-2 group">
+                    className="text-xs text-slate-500 hover:text-emerald-400 font-medium transition-all duration-200 flex items-center gap-2 group hover:translate-x-1 cursor-pointer">
                     <span className="w-1 h-1 rounded-full bg-slate-700 group-hover:bg-emerald-500 group-hover:shadow-[0_0_6px_rgba(16,185,129,0.6)] transition-all duration-200 flex-shrink-0" />
                     {link.label}
                   </Link>
@@ -272,7 +270,7 @@ function DashboardFooter() {
               {legalLinks.map((link) => (
                 <li key={link.href}>
                   <Link href={link.href}
-                    className="text-xs text-slate-500 hover:text-emerald-400 font-medium transition-colors duration-150 flex items-center gap-2 group">
+                    className="text-xs text-slate-500 hover:text-emerald-400 font-medium transition-all duration-200 flex items-center gap-2 group hover:translate-x-1 cursor-pointer">
                     <span className="w-1 h-1 rounded-full bg-slate-700 group-hover:bg-emerald-500 group-hover:shadow-[0_0_6px_rgba(16,185,129,0.6)] transition-all duration-200 flex-shrink-0" />
                     {link.label}
                   </Link>
@@ -292,14 +290,19 @@ function DashboardFooter() {
             </p>
             <ul className="space-y-3">
               {emergencyContacts.map((contact) => (
-                <li key={contact.label} className="flex items-center gap-3 group cursor-default">
-                  <div className="p-1.5 bg-red-500/10 border border-red-500/20 group-hover:bg-red-500/15 group-hover:border-red-500/30 rounded-lg flex-shrink-0 transition-all duration-200">
-                    <Phone className="w-3 h-3 text-red-400" />
-                  </div>
-                  <div>
-                    <p className="text-[10px] text-slate-500 font-semibold leading-none mb-0.5">{contact.label}</p>
-                    <p className="text-xs font-extrabold text-white tracking-wide">{contact.number}</p>
-                  </div>
+                <li key={contact.label}>
+                  <a 
+                    href={`tel:${contact.number.replace(/[^0-9+]/g, '')}`} 
+                    className="flex items-center gap-3 group cursor-pointer w-fit"
+                  >
+                    <div className="p-1.5 bg-red-500/10 border border-red-500/20 group-hover:bg-red-500/20 group-hover:border-red-500/40 rounded-lg flex-shrink-0 transition-all duration-200 group-hover:scale-105">
+                      <Phone className="w-3 h-3 text-red-400 group-hover:text-red-300 transition-colors" />
+                    </div>
+                    <div>
+                      <p className="text-[10px] text-slate-500 group-hover:text-slate-400 font-semibold leading-none mb-0.5 transition-colors">{contact.label}</p>
+                      <p className="text-xs font-extrabold text-white group-hover:text-red-100 tracking-wide transition-colors">{contact.number}</p>
+                    </div>
+                  </a>
                 </li>
               ))}
             </ul>
@@ -365,6 +368,7 @@ export default function DashboardPage() {
         const guestMode = localStorage.getItem("wc_guest_mode") === "true";
         const { data: { session } } = await supabaseClient.auth.getSession();
         if (!session && !guestMode) {
+          sessionStorage.setItem('wc_prev_path', window.location.pathname || '/dashboard');
           router.push("/login?redirect=/dashboard");
         } else if (session) {
           setUser(session.user); setIsGuest(false); loadUserCases(session.access_token);
@@ -372,13 +376,14 @@ export default function DashboardPage() {
           setIsGuest(true); setLoading(false);
         }
       } catch (err) {
-        console.error("Auth check error:", err);
-        router.push("/login?redirect=/dashboard");
+      console.error("Auth check error:", err);
+      sessionStorage.setItem('wc_prev_path', window.location.pathname || '/dashboard');
+      router.push("/login?redirect=/dashboard");
       }
     };
     checkUser();
     const { data: { subscription } } = supabaseClient.auth.onAuthStateChange((event, session) => {
-      if (event === "SIGNED_OUT") { router.push("/login"); }
+      if (event === "SIGNED_OUT") { sessionStorage.setItem('wc_prev_path', window.location.pathname || '/dashboard'); router.push("/login"); }
       else if (session) { setUser(session.user); setIsGuest(false); localStorage.removeItem("wc_guest_mode"); }
     });
     return () => subscription.unsubscribe();
@@ -387,6 +392,7 @@ export default function DashboardPage() {
   const handleLogout = async () => {
     await supabaseClient.auth.signOut();
     localStorage.removeItem("wc_guest_mode");
+    sessionStorage.setItem('wc_prev_path', window.location.pathname || '/dashboard');
     router.push("/login");
   };
 

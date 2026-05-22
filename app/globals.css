@@ -18,20 +18,36 @@
   --font-sans: var(--font-plus-jakarta-sans);
 }
 
+/* Map common Tailwind slate utilities to CSS variables so theme toggle affects them consistently */
+:root {
+  /* Ensure utility mappings use the same tokens */
+}
+
+.text-slate-900 { color: var(--text-primary) !important; }
+.text-slate-700 { color: var(--text-secondary) !important; }
+.text-slate-500 { color: var(--text-tertiary) !important; }
+.bg-white { background-color: var(--surface) !important; }
+.bg-slate-50 { background-color: var(--bg-tertiary) !important; }
+.border-slate-200 { border-color: var(--border) !important; }
+
+.dark .text-slate-900 { color: var(--text-primary) !important; }
+.dark .bg-white { background-color: var(--surface) !important; }
+
+
 @layer base {
   :root {
     /* Colors */
     --bg-primary: #ffffff;
-    --bg-secondary: #f8fafc;
-    --bg-tertiary: #f1f5f9;
+    --bg-secondary: #f1f5f9;
+    --bg-tertiary: #eef6ff;
     --surface: #ffffff;
     --surface-raised: #f8fafc;
-    --border: #e2e8f0;
-    --border-subtle: #f1f5f9;
+    --border: #cbd5e1;
+    --border-subtle: #e6eef8;
     
-    --text-primary: #0f172a;
-    --text-secondary: #475569;
-    --text-tertiary: #94a3b8;
+    --text-primary: #071433;
+    --text-secondary: #334155;
+    --text-tertiary: #64748b;
     
     --accent: #059669;
     --accent-hover: #047857;
