@@ -44,10 +44,10 @@ export default function ResultPage() {
   const [allowContact, setAllowContact] = useState(false);
 
   useEffect(() => {
-    supabaseClient.auth.getSession().then(({ data: { session } }) => {
+    supabaseClient.auth.getSession().then(({ data: { session } }: { data: { session: import('@supabase/supabase-js').Session | null } }) => {
       setUser(session?.user ?? null);
     });
-    const { data: { subscription } } = supabaseClient.auth.onAuthStateChange((_event, session) => {
+    const { data: { subscription } } = supabaseClient.auth.onAuthStateChange((_event: import('@supabase/supabase-js').AuthChangeEvent, session: import('@supabase/supabase-js').Session | null) => {
       setUser(session?.user ?? null);
     });
     return () => subscription.unsubscribe();

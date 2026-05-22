@@ -56,23 +56,69 @@ export default function LegalRadarPage() {
   };
 
   useEffect(() => {
-    try {
-      const storedData = localStorage.getItem('wc_case_data');
-      if (storedData) {
-        const parsed = JSON.parse(storedData);
-        setCaseData(parsed);
-        if (parsed.description) {
-          fetchAnalysis(parsed);
+    const loadCaseAndAnalyze = async () => {
+      try {
+        // Import supabaseClient untuk cek session
+        const { supabaseClient } = await import('@/lib/supabase');
+        const { data: { session } } = await supabaseClient.auth.getSession();
+
+        let bestCase: Case | null = null;
+
+        if (session?.access_token) {
+          // User login: ambil kasus terbaru dari API
+          const res = await fetch('/api/cases', {
+            headers: { Authorization: `Bearer ${session.access_token}` },
+          });
+          if (res.ok) {
+            const data = await res.json();
+            if (Array.isArray(data) && data.length > 0) {
+              // Ambil kasus paling baru yang punya description
+              bestCase = data
+                .filter((c: Case) => c.description?.trim())
+                .sort((a: Case, b: Case) =>
+                  new Date(b.created_at || b.updated_at).getTime() -
+                  new Date(a.created_at || a.updated_at).getTime()
+                )[0] || null;
+            }
+          }
+        }
+
+        // Fallback: cek session_id (guest atau baru selesai interview)
+        if (!bestCase) {
+          const sessionId = sessionStorage.getItem('sessionId');
+          if (sessionId) {
+            const headers: HeadersInit = {};
+            if (session?.access_token) headers['Authorization'] = `Bearer ${session.access_token}`;
+            const res = await fetch(`/api/cases?session_id=${sessionId}`, { headers });
+            if (res.ok) {
+              const data = await res.json();
+              if (data?.description?.trim()) bestCase = data;
+            }
+          }
+        }
+
+        // Fallback terakhir: localStorage (legacy)
+        if (!bestCase) {
+          const storedData = localStorage.getItem('wc_case_data');
+          if (storedData) {
+            const parsed = JSON.parse(storedData);
+            if (parsed?.description?.trim()) bestCase = parsed;
+          }
+        }
+
+        if (bestCase) {
+          setCaseData(bestCase);
+          fetchAnalysis(bestCase);
         } else {
           setLoading(false);
         }
-      } else {
+      } catch (e) {
+        console.error('Failed to load case data for legal radar', e);
         setLoading(false);
       }
-    } catch (e) {
-      console.error('Failed to parse case data', e);
-      setLoading(false);
-    }
+    };
+
+    loadCaseAndAnalyze();
   }, []);
 
   if (!loading && (!caseData || !caseData.description)) {
