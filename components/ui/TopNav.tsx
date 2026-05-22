@@ -1,16 +1,16 @@
 'use client';
 
 import { useRouter, usePathname } from 'next/navigation';
+import Link from 'next/link';
 import { ChevronLeft, Share2, Shield } from 'lucide-react';
-import { ThemeToggle } from './ThemeToggle';
 
 export function TopNav() {
   const router = useRouter();
   const pathname = usePathname();
 
-  let leftContent = null;
-  let centerContent = '';
-  let rightContent: React.ReactNode = <ThemeToggle />;
+  let leftContent: React.ReactNode = null;
+  let centerContent: React.ReactNode = '';
+  let rightContent: React.ReactNode = null;
 
   const backBtn = (onClick: () => void) => (
     <button
@@ -38,7 +38,6 @@ export function TopNav() {
         >
           <Share2 className="w-5 h-5 text-slate-700 dark:text-slate-200" />
         </button>
-        <ThemeToggle />
       </div>
     );
   } else if (pathname === '/legal-radar') {
@@ -48,12 +47,26 @@ export function TopNav() {
     leftContent = backBtn(() => router.back());
     centerContent = 'Cari LBH';
   } else {
+    // Menentukan target redirect secara dinamis
+    const logoTarget = pathname === '/' ? '/' : '/dashboard';
+
     leftContent = (
-      <div className="p-2 rounded-full">
+      <Link
+        href={logoTarget}
+        className="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors block cursor-pointer"
+      >
         <Shield className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
-      </div>
+      </Link>
     );
-    centerContent = 'WitnessChain';
+
+    centerContent = (
+      <Link
+        href={logoTarget}
+        className="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors cursor-pointer"
+      >
+        WitnessChain
+      </Link>
+    );
   }
 
   return (

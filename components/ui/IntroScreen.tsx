@@ -3,7 +3,6 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { Shield, FileText, Scale } from 'lucide-react';
-import { ThemeToggle } from './ThemeToggle';
 
 export function IntroScreen() {
   const [showIntro, setShowIntro] = useState(false);
@@ -46,7 +45,7 @@ export function IntroScreen() {
       />
 
       <div className="absolute top-4 right-4 z-20">
-        <ThemeToggle />
+        {/* ThemeToggle removed — app uses dark-only mode */}
       </div>
 
       <div className="relative flex flex-col items-center justify-center h-full px-4">
@@ -105,12 +104,13 @@ export function IntroScreen() {
         >
           <button
             onClick={handleClose}
-            className="px-10 py-4 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-lg rounded-full transition-all duration-200 hover:scale-105 shadow-lg shadow-emerald-600/25 dark:shadow-emerald-900/30"
+            className="px-10 py-4 bg-slate-900 hover:bg-slate-800 text-emerald-300 font-bold text-lg rounded-full transition-all duration-200 hover:scale-105 shadow-lg shadow-black/40"
           >
             Mulai Sekarang →
           </button>
           <Link
             href="/login"
+            onClick={() => sessionStorage.setItem('wc_prev_path', window.location.pathname)}
             className="text-slate-500 dark:text-slate-500 text-sm hover:text-emerald-600 dark:hover:text-slate-400 transition-colors"
           >
             Sudah punya akun? Masuk

@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { useEffect, useState, useRef } from "react";
 import { Button } from "@/components/ui/Button";
-import { ThemeToggle } from "@/components/ui/ThemeToggle";
 import { IntroScreen } from "@/components/ui/IntroScreen";
 import { FaXTwitter, FaInstagram, FaLinkedin, FaGithub } from "react-icons/fa6";
 import {
@@ -614,6 +613,12 @@ function AnimatedNotifications() {
 export default function HomePage() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const handleStartGuest = () => {
+    if (typeof window !== "undefined") {
+      localStorage.setItem("wc_guest_mode", "true");
+      document.cookie = "wc_guest_mode=true; path=/; max-age=31536000";
+    }
+  };
 
   useEffect(() => {
     // Always start at top on mount/refresh
@@ -673,7 +678,7 @@ export default function HomePage() {
 
           {/* Buttons — kanan mepet */}
           <div className="flex items-center gap-3 flex-shrink-0 ml-auto">
-            <ThemeToggle />
+            {/* ThemeToggle removed — dark-only mode */}
             <Link
               href="/login"
               onClick={() =>
@@ -688,12 +693,11 @@ export default function HomePage() {
                 Masuk
               </Button>
             </Link>
-            <Link href="/dashboard">
+            <Link href="/dashboard" onClick={handleStartGuest}>
               <Button
                 variant="primary"
                 size="sm"
-                className="font-semibold hidden sm:flex bg-emerald-500 hover:bg-emerald-400 text-white"
-              >
+                className="font-semibold hidden sm:flex bg-emerald-500 hover:bg-emerald-400 text-white">
                 Mulai Gratis
               </Button>
             </Link>
@@ -729,7 +733,13 @@ export default function HomePage() {
                 {item.label}
               </button>
             ))}
-            <Link href="/login" className="block">
+            <Link
+              href="/login"
+              className="block"
+              onClick={() =>
+                sessionStorage.setItem("wc_prev_path", window.location.pathname)
+              }
+            >
               <Button
                 variant="ghost"
                 size="sm"
@@ -738,7 +748,7 @@ export default function HomePage() {
                 Masuk
               </Button>
             </Link>
-            <Link href="/dashboard" className="block">
+            <Link href="/dashboard" className="block" onClick={handleStartGuest}>
               <Button
                 variant="primary"
                 size="sm"
@@ -799,7 +809,7 @@ export default function HomePage() {
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-16">
-            <Link href="/dashboard">
+            <Link href="/dashboard" onClick={handleStartGuest}>
               <Button className="px-8 py-4 bg-emerald-500 hover:bg-emerald-400 text-white font-bold text-base rounded-full shadow-lg shadow-emerald-900/40 hover:scale-105 transition-transform">
                 Mulai Dokumentasi →
               </Button>
@@ -896,7 +906,9 @@ export default function HomePage() {
               <p className="text-3xl md:text-4xl font-black text-emerald-400 mb-2">
                 {s.value}
               </p>
-              <p className="text-slate-600 dark:text-slate-400 text-sm font-medium">{s.label}</p>
+              <p className="text-slate-600 dark:text-slate-400 text-sm font-medium">
+                {s.label}
+              </p>
             </div>
           ))}
         </div>
@@ -916,7 +928,8 @@ export default function HomePage() {
               Tiga langkah menyusun dokumentasi
             </h2>
             <p className="text-slate-600 dark:text-slate-400 text-lg max-w-2xl mx-auto">
-              Dari cerita menjadi ringkasan terstruktur yang lebih mudah dibaca LBH
+              Dari cerita menjadi ringkasan terstruktur yang lebih mudah dibaca
+              LBH
             </p>
           </div>
 
@@ -950,7 +963,9 @@ export default function HomePage() {
                 </p>
                 <div className="flex items-center gap-3 mb-4">
                   {step.icon}
-                  <h3 className="text-xl font-bold text-slate-900 dark:text-white">{step.title}</h3>
+                  <h3 className="text-xl font-bold text-slate-900 dark:text-white">
+                    {step.title}
+                  </h3>
                 </div>
                 <p className="text-slate-600 dark:text-slate-400 text-sm leading-relaxed">
                   {step.desc}
@@ -1017,8 +1032,12 @@ export default function HomePage() {
                   <div key={idx} className="flex gap-4">
                     <div className="flex-shrink-0 mt-1">{feature.icon}</div>
                     <div>
-                      <h3 className="font-bold text-slate-900 dark:text-white">{feature.title}</h3>
-                      <p className="text-slate-600 dark:text-slate-400 text-sm">{feature.desc}</p>
+                      <h3 className="font-bold text-slate-900 dark:text-white">
+                        {feature.title}
+                      </h3>
+                      <p className="text-slate-600 dark:text-slate-400 text-sm">
+                        {feature.desc}
+                      </p>
                     </div>
                   </div>
                 ))}
@@ -1123,11 +1142,11 @@ export default function HomePage() {
           </p>
 
           {/* HIGH CONTRAST CTA button — dark on light */}
-          <Link href="/dashboard">
-            <button className="group inline-flex items-center gap-3 px-10 py-4 bg-white text-emerald-700 font-black text-base rounded-full shadow-[0_4px_24px_rgba(0,0,0,0.25)] hover:bg-slate-50 hover:shadow-[0_8px_32px_rgba(0,0,0,0.3)] hover:scale-105 active:scale-100 transition-all duration-200">
+          <Link href="/dashboard" onClick={handleStartGuest}>
+            <button className="group inline-flex items-center gap-3 px-10 py-4 bg-slate-900 text-emerald-300 font-black text-base rounded-full shadow-[0_8px_40px_rgba(2,6,23,0.6)] hover:bg-slate-800 hover:scale-105 active:scale-100 transition-all duration-200">
               Mulai Dokumentasi Gratis
-              <span className="w-7 h-7 rounded-full bg-emerald-100 flex items-center justify-center group-hover:bg-emerald-200 transition-colors">
-                <ArrowRight className="w-4 h-4 text-emerald-700" />
+              <span className="w-7 h-7 rounded-full bg-slate-800/60 flex items-center justify-center group-hover:bg-slate-700/60 transition-colors">
+                <ArrowRight className="w-4 h-4 text-emerald-300" />
               </span>
             </button>
           </Link>
@@ -1220,6 +1239,7 @@ export default function HomePage() {
                   <li key={item.label}>
                     <Link
                       href={item.href}
+                      onClick={item.href === "/dashboard" ? handleStartGuest : undefined}
                       className="text-sm text-slate-500 hover:text-emerald-400 transition-colors"
                     >
                       {item.label}

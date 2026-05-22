@@ -56,7 +56,7 @@ export default function MyDocumentsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-white dark:bg-slate-900 pt-24 pb-32">
+    <div className="min-h-dvh bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-white transition-colors duration-500 pt-24 pb-32">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
@@ -69,7 +69,7 @@ export default function MyDocumentsPage() {
             </p>
           </div>
           <Link href="/interview">
-            <Button className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-6 py-3 rounded-lg flex items-center gap-2">
+            <Button className="bg-slate-900 hover:bg-slate-800 text-emerald-300 font-bold px-6 py-3 rounded-lg flex items-center gap-2 shadow-md">
               <Plus className="w-5 h-5" />
               Buat Dokumentasi Baru
             </Button>

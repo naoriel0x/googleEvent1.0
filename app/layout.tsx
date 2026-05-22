@@ -4,6 +4,7 @@ import './globals.css';
 import NavWrapper from '@/components/ui/NavWrapper';
 import { ThemeScript } from '@/components/ui/ThemeScript';
 import { ThemeProvider } from '@/components/ui/ThemeProvider';
+import { AuthProvider } from '@/lib/auth-context';
 
 const plusJakartaSans = Plus_Jakarta_Sans({
   subsets: ['latin'],
@@ -43,11 +44,13 @@ export default function RootLayout({
       <body
         className={`${plusJakartaSans.variable} ${outfit.variable} font-sans min-h-dvh text-[var(--text-primary)] bg-[var(--bg-secondary)]`}
       >
-        <ThemeProvider>
-          <div className="min-h-dvh flex flex-col bg-[var(--bg-secondary)]">
-            <NavWrapper>{children}</NavWrapper>
-          </div>
-        </ThemeProvider>
+        <AuthProvider>
+          <ThemeProvider>
+            <div className="min-h-dvh flex flex-col bg-[var(--bg-secondary)]">
+              <NavWrapper>{children}</NavWrapper>
+            </div>
+          </ThemeProvider>
+        </AuthProvider>
       </body>
     </html>
   );

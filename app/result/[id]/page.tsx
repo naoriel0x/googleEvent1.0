@@ -155,7 +155,7 @@ export default function ResultPage() {
 
   if (loading) {
     return (
-      <div className="flex-1 min-h-full bg-slate-50 dark:bg-slate-950 flex items-center justify-center">
+      <div className="min-h-dvh bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-white flex items-center justify-center">
         <Spinner size="lg" />
       </div>
     );
@@ -163,7 +163,7 @@ export default function ResultPage() {
 
   if (!caseData) {
     return (
-      <div className="flex-1 min-h-full bg-slate-50 dark:bg-slate-950 flex items-center justify-center">
+      <div className="min-h-dvh bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-white flex items-center justify-center">
         <div className="text-center">
           <p className="text-slate-600 mb-4">Kasus tidak ditemukan</p>
           <Link href="/interview">
@@ -175,17 +175,18 @@ export default function ResultPage() {
   }
 
   return (
-    <div className="flex-1 min-h-full bg-slate-50 dark:bg-slate-950">
-
-
-      <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div className="min-h-dvh bg-slate-950 text-slate-100 relative">
+    {/* Decorative blobs */}
+    <div className="fixed top-0 right-0 w-[40%] h-[30%] bg-emerald-950/15 rounded-full blur-[140px] pointer-events-none z-0" />
+    <div className="fixed bottom-0 left-0 w-[40%] h-[35%] bg-teal-950/10 rounded-full blur-[140px] pointer-events-none z-0" />
+    <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12 relative z-10">
         {/* Title */}
         <div className="mb-12">
-          <h1 className="font-serif text-4xl font-bold text-slate-900 dark:text-white mb-2">
+          <h1 className="font-serif text-4xl font-bold text-slate-100 mb-2">
             Hasil Dokumentasi Kasusmu
           </h1>
-          <p className="text-sm font-semibold text-slate-500">
-            Nomor Kasus: <span className="font-mono bg-slate-200 text-slate-700 px-2 py-0.5 rounded text-xs">{caseData.id}</span>
+          <p className="text-sm font-semibold text-slate-400">
+            Nomor Kasus: <span className="font-mono bg-slate-800 text-slate-300 px-2 py-0.5 rounded text-xs">{caseData.id}</span>
           </p>
         </div>
 
@@ -199,13 +200,13 @@ export default function ResultPage() {
           {/* Main Content */}
           <div className="lg:col-span-2 space-y-8">
             {/* Case Info */}
-            <section className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-700 p-8 shadow-sm">
-              <h2 className="text-2xl font-bold text-slate-900 mb-6 flex items-center gap-2">
-                <FileText className="w-6 h-6 text-emerald-600" />
+            <section className="bg-slate-900/40 rounded-2xl border border-slate-800/80 p-8 shadow-sm">
+              <h2 className="text-2xl font-bold text-slate-100 mb-6 flex items-center gap-2">
+                <FileText className="w-6 h-6 text-emerald-400" />
                 Detail Kejadian
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-                <div className="bg-slate-50 dark:bg-slate-950 p-4 rounded-xl border border-slate-100 shadow-inner">
+                <div className="bg-slate-800/80 p-4 rounded-xl border border-slate-700 shadow-inner">
                   <p className="text-xs text-slate-400 font-bold uppercase tracking-wider mb-1 flex items-center gap-1.5">
                     <User className="w-3.5 h-3.5 text-slate-400" />
                     Nama Pelapor
@@ -214,7 +215,7 @@ export default function ResultPage() {
                     {caseData.reporter_name || 'Belum diisi'}
                   </p>
                 </div>
-                <div className="bg-slate-50 dark:bg-slate-950 p-4 rounded-xl border border-slate-100 shadow-inner">
+                <div className="bg-slate-800/80 p-4 rounded-xl border border-slate-700 shadow-inner">
                   <p className="text-xs text-slate-400 font-bold uppercase tracking-wider mb-1 flex items-center gap-1.5">
                     <ShieldAlert className="w-3.5 h-3.5 text-slate-400" />
                     Jenis Pelanggaran
@@ -223,12 +224,12 @@ export default function ResultPage() {
                     {caseData.violation_type?.replace(/_/g, ' ').toUpperCase() || 'Belum ditentukan'}
                   </p>
                 </div>
-                <div className="bg-slate-50 dark:bg-slate-950 p-4 rounded-xl border border-slate-100 shadow-inner">
+                <div className="bg-slate-800/80 p-4 rounded-xl border border-slate-700 shadow-inner">
                   <p className="text-xs text-slate-400 font-bold uppercase tracking-wider mb-1 flex items-center gap-1.5">
                     <Calendar className="w-3.5 h-3.5 text-slate-400" />
                     Tanggal Kejadian
                   </p>
-                  <p className="text-sm font-bold text-slate-900">
+                  <p className="text-sm font-bold text-slate-100">
                     {caseData.incident_date
                       ? new Date(caseData.incident_date).toLocaleDateString('id-ID', {
                         year: 'numeric',
@@ -238,7 +239,7 @@ export default function ResultPage() {
                       : 'Belum ditentukan'}
                   </p>
                 </div>
-                <div className="bg-slate-50 dark:bg-slate-950 p-4 rounded-xl border border-slate-100 shadow-inner md:col-span-2">
+                <div className="bg-slate-800/80 p-4 rounded-xl border border-slate-700 shadow-inner md:col-span-2">
                   <p className="text-xs text-slate-400 font-bold uppercase tracking-wider mb-1 flex items-center gap-1.5">
                     <MapPin className="w-3.5 h-3.5 text-slate-400" />
                     Lokasi Kejadian
@@ -247,7 +248,7 @@ export default function ResultPage() {
                     {caseData.incident_location || 'Belum ditentukan'}
                   </p>
                 </div>
-                <div className="bg-slate-50 dark:bg-slate-950 p-4 rounded-xl border border-slate-100 shadow-inner">
+                <div className="bg-slate-800/80 p-4 rounded-xl border border-slate-700 shadow-inner">
                   <p className="text-xs text-slate-400 font-bold uppercase tracking-wider mb-1 flex items-center gap-1.5">
                     <Users className="w-3.5 h-3.5 text-slate-400" />
                     Pihak Terlibat / Pelaku
@@ -259,63 +260,63 @@ export default function ResultPage() {
               </div>
               <div>
                 <p className="text-xs text-slate-400 font-bold uppercase tracking-wider mb-2">Kronologi / Deskripsi Kejadian</p>
-                <p className="text-sm text-slate-700 leading-relaxed whitespace-pre-wrap bg-slate-50 dark:bg-slate-950/50 p-5 rounded-xl border border-slate-100">
+                <p className="text-sm text-slate-300 leading-relaxed whitespace-pre-wrap bg-slate-800/50 p-5 rounded-xl border border-slate-700">
                   {caseData.description || 'Belum ada deskripsi'}
                 </p>
               </div>
             </section>
 
             {/* Timeline */}
-            <section className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-700 p-8 shadow-sm">
-              <h2 className="text-2xl font-bold text-slate-900 mb-6 flex items-center gap-2">
-                <Clock className="w-6 h-6 text-emerald-600" />
+            <section className="bg-slate-900/40 rounded-2xl border border-slate-800/80 p-8 shadow-sm">
+              <h2 className="text-2xl font-bold text-slate-100 mb-6 flex items-center gap-2">
+                <Clock className="w-6 h-6 text-emerald-400" />
                 Kronologi Kejadian
               </h2>
               <TimelineVisualizer events={caseData.timeline_events || []} />
             </section>
 
             {/* Witnesses */}
-            <section className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-700 p-8 shadow-sm">
-              <h2 className="text-2xl font-bold text-slate-900 mb-6 flex items-center gap-2">
-                <Users className="w-6 h-6 text-emerald-600" />
+            <section className="bg-slate-900/40 rounded-2xl border border-slate-800/80 p-8 shadow-sm">
+              <h2 className="text-2xl font-bold text-slate-100 mb-6 flex items-center gap-2">
+                <Users className="w-6 h-6 text-emerald-400" />
                 Daftar Saksi
               </h2>
               {caseData.witnesses && caseData.witnesses.length > 0 ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {caseData.witnesses.map((witness, index) => (
-                    <div key={index} className="p-4 bg-slate-50 dark:bg-slate-950 border border-slate-100 rounded-xl relative">
+                    <div key={index} className="p-4 bg-slate-800/50 border border-slate-700 rounded-xl relative">
                       <div className="flex items-center gap-2.5 mb-2">
-                        <div className="p-1.5 bg-emerald-50 rounded-lg text-emerald-600">
+                        <div className="p-1.5 bg-emerald-950/50 rounded-lg text-emerald-400">
                           <Users className="w-4 h-4" />
                         </div>
-                        <p className="font-bold text-slate-900 text-sm">{witness.name}</p>
+                        <p className="font-bold text-slate-100 text-sm">{witness.name}</p>
                       </div>
-                      <p className="text-xs text-slate-500 font-medium">
-                        Hubungan: <strong className="text-slate-700">{witness.relationship}</strong>
+                      <p className="text-xs text-slate-400 font-medium">
+                        Hubungan: <strong className="text-slate-300">{witness.relationship}</strong>
                       </p>
                       {witness.contact && (
-                        <p className="text-xs text-slate-500 font-medium mt-1">
-                          Kontak: <strong className="text-slate-700">{witness.contact}</strong>
+                        <p className="text-xs text-slate-400 font-medium mt-1">
+                          Kontak: <strong className="text-slate-300">{witness.contact}</strong>
                         </p>
                       )}
                     </div>
                   ))}
                 </div>
               ) : (
-                <p className="text-sm text-slate-400 font-medium bg-slate-50 dark:bg-slate-950 p-5 rounded-xl text-center border border-slate-100">Belum ada saksi yang dicatat</p>
+                <p className="text-sm text-slate-400 font-medium bg-slate-800/50 p-5 rounded-xl text-center border border-slate-700">Belum ada saksi yang dicatat</p>
               )}
             </section>
 
             {/* Evidence */}
-            <section className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-700 p-8 shadow-sm">
-              <h2 className="text-2xl font-bold text-slate-900 mb-6 flex items-center gap-2">
-                <FileCheck2 className="w-6 h-6 text-emerald-600" />
+            <section className="bg-slate-900/40 rounded-2xl border border-slate-800/80 p-8 shadow-sm">
+              <h2 className="text-2xl font-bold text-slate-100 mb-6 flex items-center gap-2">
+                <FileCheck2 className="w-6 h-6 text-emerald-400" />
                 Bukti yang Diunggah
               </h2>
               {caseData.evidence && caseData.evidence.length > 0 ? (
                 <EvidenceTimeline evidence={caseData.evidence} />
               ) : (
-                <p className="text-sm text-slate-400 font-medium bg-slate-50 dark:bg-slate-950 p-5 rounded-xl text-center border border-slate-100">Belum ada bukti yang diunggah</p>
+                <p className="text-sm text-slate-400 font-medium bg-slate-800/50 p-5 rounded-xl text-center border border-slate-700">Belum ada bukti yang diunggah</p>
               )}
             </section>
           </div>
@@ -323,19 +324,19 @@ export default function ResultPage() {
           {/* Sidebar */}
           <div className="lg:col-span-1 space-y-6">
             {/* Download PDF / Lock Status */}
-            <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-700 p-6 shadow-sm space-y-4">
-              <h3 className="text-lg font-bold text-slate-900 flex items-center gap-2">
+            <div className="bg-slate-900/40 rounded-2xl border border-slate-800/80 p-6 shadow-sm space-y-4">
+              <h3 className="text-lg font-bold text-slate-100 flex items-center gap-2">
                 {caseData.status === 'completed' ? (
-                  <Lock className="w-5 h-5 text-emerald-600 animate-pulse" />
+                  <Lock className="w-5 h-5 text-emerald-400 animate-pulse" />
                 ) : (
-                  <Download className="w-5 h-5 text-emerald-600" />
+                  <Download className="w-5 h-5 text-emerald-400" />
                 )}
                 {caseData.status === 'completed' ? 'Dokumen Terkunci' : 'Unduh Dokumen'}
               </h3>
 
               <Button
                 variant="primary"
-                className="w-full font-bold gap-2 shadow-sm bg-emerald-600 hover:bg-emerald-700 border-0 text-white"
+                className="w-full font-bold gap-2 shadow-sm bg-emerald-600 hover:bg-emerald-500 border-0 text-white"
                 onClick={handleDownloadPDF}
                 loading={downloading}
               >
@@ -351,7 +352,7 @@ export default function ResultPage() {
               </Button>
 
               {caseData.status === 'completed' && (
-                <div className="flex items-center justify-center gap-1.5 py-1 px-3 bg-emerald-50 border border-emerald-100 rounded-lg text-[10px] text-emerald-800 font-bold">
+                <div className="flex items-center justify-center gap-1.5 py-1 px-3 bg-emerald-950/40 border border-emerald-900/50 rounded-lg text-[10px] text-emerald-300 font-bold">
                   <span>🔒 Terkunci & Aman</span>
                 </div>
               )}
@@ -365,16 +366,16 @@ export default function ResultPage() {
 
             {/* Guest Alert Box */}
             {!user && caseData.status === 'draft' && (
-              <div className="bg-linear-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-2xl p-5 shadow-sm space-y-3 animate-fadeIn">
-                <h4 className="text-xs font-extrabold text-amber-800 flex items-center gap-1.5">
-                  <AlertTriangle className="w-4 h-4 text-amber-600 animate-pulse shrink-0" />
+              <div className="bg-amber-950/40 border border-amber-900/50 rounded-2xl p-5 shadow-sm space-y-3 animate-fadeIn">
+                <h4 className="text-xs font-extrabold text-amber-300 flex items-center gap-1.5">
+                  <AlertTriangle className="w-4 h-4 text-amber-400 animate-pulse shrink-0" />
                   Peringatan Pengguna Tamu
                 </h4>
-                <p className="text-[11px] text-amber-700 leading-relaxed font-semibold">
+                <p className="text-[11px] text-amber-200 leading-relaxed font-semibold">
                   Anda sedang mengakses sebagai tamu. Daftarkan akun WitnessChain gratis terlebih dahulu agar kasus ini tersimpan permanen di dashboard Anda dan bisa diunduh kembali kapan saja.
                 </p>
                 <Link href={`/login?redirect=/result/${caseId}`} className="block">
-                  <Button variant="secondary" className="w-full text-xs font-bold bg-white hover:bg-slate-50 dark:bg-slate-950 border border-amber-300 text-amber-800 py-2">
+                  <Button variant="secondary" className="w-full text-xs font-bold bg-slate-800 hover:bg-slate-700 dark:bg-slate-950 border border-amber-800/50 text-amber-300 py-2">
                     Daftar / Masuk Sekarang
                   </Button>
                 </Link>
@@ -382,14 +383,14 @@ export default function ResultPage() {
             )}
 
             {/* Next Steps */}
-            <div className="bg-emerald-50 border border-emerald-100 rounded-2xl p-6 shadow-sm space-y-4">
-              <h3 className="text-lg font-bold text-emerald-950 flex items-center gap-2">
-                <Check className="w-5 h-5 text-emerald-600" />
+            <div className="bg-emerald-950/40 border border-emerald-900/50 rounded-2xl p-6 shadow-sm space-y-4">
+              <h3 className="text-lg font-bold text-emerald-300 flex items-center gap-2">
+                <Check className="w-5 h-5 text-emerald-400" />
                 Langkah Berikutnya
               </h3>
-              <ul className="space-y-3.5 text-xs text-emerald-900 font-semibold">
+              <ul className="space-y-3.5 text-xs text-emerald-200 font-semibold">
                 <li className="flex gap-2.5 items-center">
-                  <div className="p-1 bg-emerald-100 rounded text-emerald-700">
+                  <div className="p-1 bg-emerald-500/15 rounded text-emerald-400">
                     <Check className="w-3.5 h-3.5" />
                   </div>
                   <span>Unduh dokumen hasil WitnessChain.</span>
