@@ -614,6 +614,7 @@ export default function HomePage() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const handleStartGuest = () => {
     if (typeof window !== "undefined") {
+      localStorage.removeItem('wc_cases');
       localStorage.setItem("wc_guest_mode", "true");
       document.cookie = "wc_guest_mode=true; path=/; max-age=31536000";
     }

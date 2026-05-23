@@ -1,70 +1,81 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
+// middleware.ts
+import { NextResponse, type NextRequest } from 'next/server';
+import { createServerClient } from '@supabase/ssr';
+import { isAdminTokenValid } from '@/lib/admin-auth';
 
-const publicRoutes = [
-  '/',
-  '/login',
-  '/share',
-];
-
-const protectedRoutes = [
-  '/dashboard',
-  '/interview',
-  '/result',
-  '/admin',
-  '/my-documents',
-  '/legal-radar',
-];
+// Public routes yang tidak perlu auth Supabase
+const publicRoutes = ['/', '/login', '/share'];
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // Jika sudah di public route atau static assets, lanjut
-  if (publicRoutes.some(route => pathname === route) || pathname.startsWith('/public')) {
+  // Skip static files & internal routes
+  if (
+    pathname.startsWith('/_next') ||
+    pathname.startsWith('/api') ||
+    pathname.startsWith('/auth') || // ✅ skip /auth/callback — biar cookie session sempat di-set
+    pathname.match(/\.(jpg|jpeg|png|gif|ico|svg|webp)$/)
+  ) {
     return NextResponse.next();
   }
 
-  // Cek jika di protected route
-  const isProtectedRoute = protectedRoutes.some(route => pathname.startsWith(route));
-
-  if (isProtectedRoute) {
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-    const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-
-    if (!supabaseUrl || !supabaseAnonKey) {
+  // ── Admin routes ──────────────────────────────────────────────────────────────
+  if (pathname.startsWith('/admin')) {
+    if (pathname === '/admin/login') {
+      const token = request.cookies.get('admin_token')?.value;
+      if (isAdminTokenValid(token)) {
+        return NextResponse.redirect(new URL('/admin', request.url));
+      }
       return NextResponse.next();
     }
 
-    const supabase = createClient(supabaseUrl, supabaseAnonKey, {
-      auth: {
-        persistSession: false,
-      },
-    });
-
-    // Cek session dari cookies
-    let authenticated = false;
-    try {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
-      authenticated = !!session;
-    } catch (error) {
-      console.error('Auth check error:', error);
+    const token = request.cookies.get('admin_token')?.value;
+    if (!isAdminTokenValid(token)) {
+      return NextResponse.redirect(new URL('/admin/login', request.url));
     }
 
-    // Jika tidak authenticated di protected route, redirect ke login
-    if (!authenticated) {
-      const loginUrl = new URL('/login', request.url);
-      loginUrl.searchParams.set('redirect', pathname);
-      return NextResponse.redirect(loginUrl);
-    }
+    return NextResponse.next();
   }
 
-  return NextResponse.next();
+  // ── Public routes — skip Supabase check ──────────────────────────────────────
+  if (publicRoutes.some(r => pathname === r || pathname.startsWith(r + '/'))) {
+    return NextResponse.next();
+  }
+
+  // ── Protected routes — cek Supabase session ──────────────────────────────────
+  let response = NextResponse.next({ request: { headers: request.headers } });
+
+  // ✅ Pakai createServerClient (bukan createClient biasa) agar bisa baca cookie session
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        getAll() { return request.cookies.getAll(); },
+        setAll(cookiesToSet) {
+          cookiesToSet.forEach(({ name, value, options }) => {
+            request.cookies.set({ name, value, ...options });
+            response.cookies.set({ name, value, ...options });
+          });
+        },
+      },
+    }
+  );
+
+  const { data: { session } } = await supabase.auth.getSession();
+  const guestCookie = request.cookies.get('wc_guest_mode');
+  const isGuest = guestCookie?.value === 'true';
+
+  if (!session && !isGuest) {
+    const url = request.nextUrl.clone();
+    url.pathname = '/login';
+    url.searchParams.set('redirect', pathname);
+    return NextResponse.redirect(url);
+  }
+
+  return response;
 }
 
 export const config = {
-  matcher: [
-    '/((?!_next/static|_next/image|favicon.ico|public).*)',
-  ],
+  matcher: ['/((?!_next/static|_next/image|favicon\\.ico).*)'],
 };

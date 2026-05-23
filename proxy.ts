@@ -1,36 +1,20 @@
+// middleware.ts (atau proxy.ts tergantung setup project lo)
 import { NextResponse, type NextRequest } from 'next/server';
 import { createServerClient } from '@supabase/ssr';
-
-const ADMIN_SECRET = process.env.ADMIN_SECRET!;
+import { isAdminTokenValid } from '@/lib/admin-auth';
 
 // Public routes yang tidak perlu auth Supabase
 const publicRoutes = ['/', '/login', '/share'];
 
-// ─── Validasi admin cookie ────────────────────────────────────────────────────
-function isAdminTokenValid(token: string | undefined): boolean {
-  if (!token) return false;
-  try {
-    const decoded = Buffer.from(token, 'base64').toString('utf-8');
-    const parts = decoded.split(':');
-    if (parts.length < 3) return false;
-    const secret = parts[parts.length - 1];
-    const timestamp = parseInt(parts[parts.length - 2]);
-    if (secret !== ADMIN_SECRET) return false;
-    const age = Date.now() - timestamp;
-    if (age > 1000 * 60 * 60 * 8) return false; // 8 jam
-    return true;
-  } catch {
-    return false;
-  }
-}
-
-export async function middleware(request: NextRequest) {
+export default async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // Skip static files
+  // Skip static files & internal routes
   if (
     pathname.startsWith('/_next') ||
     pathname.startsWith('/api') ||
+    pathname.startsWith('/auth') || // ✅ FIX Bug #1: skip /auth/callback agar cookie session
+    // sempat di-set sebelum middleware ngecek session
     pathname.match(/\.(jpg|jpeg|png|gif|ico|svg|webp)$/)
   ) {
     return NextResponse.next();
@@ -38,9 +22,7 @@ export async function middleware(request: NextRequest) {
 
   // ── Admin routes ─────────────────────────────────────────────────────────────
   if (pathname.startsWith('/admin')) {
-    // Login page admin — boleh diakses tanpa cookie
     if (pathname === '/admin/login') {
-      // Kalau sudah punya cookie valid, langsung ke admin
       const token = request.cookies.get('admin_token')?.value;
       if (isAdminTokenValid(token)) {
         return NextResponse.redirect(new URL('/admin', request.url));
@@ -48,7 +30,6 @@ export async function middleware(request: NextRequest) {
       return NextResponse.next();
     }
 
-    // Semua route /admin lainnya → wajib cookie valid
     const token = request.cookies.get('admin_token')?.value;
     if (!isAdminTokenValid(token)) {
       return NextResponse.redirect(new URL('/admin/login', request.url));
@@ -96,5 +77,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/((?!_next/static|_next/image|favicon\\.ico).*)', ],
+  matcher: ['/((?!_next/static|_next/image|favicon\\.ico).*)'],
 };
