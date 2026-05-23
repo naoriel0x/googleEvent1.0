@@ -257,6 +257,7 @@ function LoginComponent() {
   };
 
   const handleGuestContinue = () => {
+    localStorage.removeItem('wc_cases');
     localStorage.setItem('wc_guest_mode', 'true');
     // Set cookie agar middleware bisa deteksi guest mode (localStorage tidak dibaca server)
     document.cookie = 'wc_guest_mode=true; path=/; max-age=86400; SameSite=Lax';

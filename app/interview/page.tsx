@@ -51,18 +51,28 @@ export default function InterviewPage() {
 
   // Initialize user session on mount
   useEffect(() => {
-    supabaseClient.auth.getSession().then(({ data: { session } }) => {
+    supabaseClient.auth.getSession().then(({ data: { session } }: { data: { session: import('@supabase/supabase-js').Session | null } }) => {
       setUser(session?.user ?? null);
     });
-    const { data: { subscription } } = supabaseClient.auth.onAuthStateChange((_event, session) => {
+    const { data: { subscription } } = supabaseClient.auth.onAuthStateChange((_event: import('@supabase/supabase-js').AuthChangeEvent, session: import('@supabase/supabase-js').Session | null) => {
       setUser(session?.user ?? null);
     });
     return () => subscription.unsubscribe();
   }, []);
 
-  // Initialize sessionId on mount — use ref to avoid setState-in-effect lint error
+  // Initialize sessionId on mount
+  // ✅ FIX Bug #2: Cek apakah session lama sudah completed — kalau iya, buat session baru
   useEffect(() => {
     const t = setTimeout(() => {
+      const existingId = sessionStorage.getItem('sessionId');
+      const sessionCompleted = sessionStorage.getItem('sessionCompleted');
+
+      // Kalau session sebelumnya sudah dikunci/completed, buat session baru
+      if (existingId && sessionCompleted === 'true') {
+        sessionStorage.removeItem('sessionId');
+        sessionStorage.removeItem('sessionCompleted');
+      }
+
       const id = sessionStorage.getItem('sessionId') || `session-${Date.now()}`;
       sessionStorage.setItem('sessionId', id);
       setSessionId(id);
@@ -86,6 +96,19 @@ export default function InterviewPage() {
         });
         const data = await response.json();
         if (data && data.id) {
+          // ✅ FIX Bug #2: Kalau kasus yang ke-load sudah completed, jangan tampilkan
+          // chat lama — reset ke state awal dan buat session baru
+          if (data.status === 'completed') {
+            const newId = `session-${Date.now()}`;
+            sessionStorage.setItem('sessionId', newId);
+            sessionStorage.removeItem('sessionCompleted');
+            setSessionId(newId);
+            setCaseData({ status: 'draft', description: '', witnesses: [], evidence: [], messages: [], completeness_score: 0 });
+            setMessages([]);
+            setHasStarted(false);
+            return;
+          }
+
           setCaseData(data);
           setMessages(data.messages || []);
           if ((data.messages || []).length > 0) {
@@ -104,7 +127,6 @@ export default function InterviewPage() {
 
   // Auto-scroll to bottom
   useEffect(() => {
-    // Scroll without smooth behavior to avoid jump animations
     messagesEndRef.current?.scrollIntoView();
   }, [messages, aiThinking]);
 
@@ -156,7 +178,6 @@ export default function InterviewPage() {
       setCaseData(updated);
       setHasStarted(true);
 
-      // Save to database
       const authHeaders = await getAuthHeaders();
       await fetch('/api/cases', {
         method: 'POST',
@@ -218,7 +239,6 @@ export default function InterviewPage() {
         document_url: undefined,
       };
 
-      // Save to database
       const authHeaders = await getAuthHeaders();
       const dbResponse = await fetch('/api/cases', {
         method: 'POST',
@@ -255,7 +275,6 @@ export default function InterviewPage() {
     setCaseData(updated);
 
     try {
-      // 1. Save to database
       const authHeaders = await getAuthHeaders();
       await fetch('/api/cases', {
         method: 'POST',
@@ -263,13 +282,11 @@ export default function InterviewPage() {
         body: JSON.stringify(updated),
       });
 
-      // Show toast
       setToast({ 
         message: `Bukti "${evidence.type === 'photo' ? 'Foto' : evidence.type === 'video' ? 'Video' : 'Dokumen'}" berhasil diunggah!`, 
         type: 'success' 
       });
 
-      // 2. Automatically notify the AI so it reacts to the upload
       const userMessage: Message = {
         role: 'user',
         content: `Saya baru saja mengunggah bukti baru: ${evidence.type === 'photo' ? 'Foto' : evidence.type === 'video' ? 'Video' : 'Dokumen'} (${evidence.description || 'Tanpa keterangan'}).`,
@@ -345,7 +362,6 @@ export default function InterviewPage() {
     try {
       setCaseData({ ...updatedData, document_url: undefined });
 
-      // Create system/user trigger message
       const userMessage: Message = {
         role: 'user',
         content: `Saya baru saja memperbarui informasi kasus melalui formulir interaktif (Nama Pelapor: ${updatedData.reporter_name || '-'}, Pihak Terlibat/Pelaku: ${updatedData.involved_parties || '-'}, Jenis Pelanggaran: ${updatedData.violation_type || '-'}, Tanggal: ${updatedData.incident_date || '-'}, Lokasi: ${updatedData.incident_location || '-'}, Deskripsi/Kronologi: ${updatedData.description ? 'Ada' : 'Belum'}, Jumlah Saksi: ${updatedData.witnesses?.length || 0} orang).`,
@@ -355,7 +371,6 @@ export default function InterviewPage() {
       const updatedMessages = [...messages, userMessage];
       setMessages(updatedMessages);
 
-      // 1. Save state and message to cases DB
       const authHeaders = await getAuthHeaders();
       const dbResponse = await fetch('/api/cases', {
         method: 'POST',
@@ -369,7 +384,6 @@ export default function InterviewPage() {
       });
       const dbData = await dbResponse.json();
 
-      // 2. Fetch AI feedback
       const response = await fetch('/api/interview', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -399,7 +413,6 @@ export default function InterviewPage() {
 
       setCaseData(finalCase);
 
-      // Save final state back to DB
       await fetch('/api/cases', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', ...authHeaders },
@@ -419,11 +432,18 @@ export default function InterviewPage() {
     }
   };
 
+  // ✅ FIX Bug #2: Dipanggil dari tombol "Cek Detail Kasus" — mark session sebagai completed
+  // sehingga saat user balik ke /interview, chat lama tidak muncul lagi
+  const handleFinishCase = () => {
+    sessionStorage.setItem('sessionCompleted', 'true');
+  };
+
   return (
     <div className="min-h-dvh bg-slate-950 text-slate-100 transition-colors duration-500 flex-1 flex flex-col relative font-sans">
       {/* Decorative blobs */}
       <div className="fixed top-0 right-0 w-[40%] h-[30%] bg-emerald-950/15 rounded-full blur-[140px] pointer-events-none z-0" />
       <div className="fixed bottom-0 left-0 w-[40%] h-[35%] bg-teal-950/10 rounded-full blur-[140px] pointer-events-none z-0" />
+
       {/* Toast Alert */}
       {toast && (
         <div className={`fixed top-20 right-4 z-50 px-5 py-3.5 rounded-2xl shadow-2xl border flex items-center gap-3 ${
@@ -437,7 +457,6 @@ export default function InterviewPage() {
           <span className="text-sm font-semibold">{toast.message}</span>
         </div>
       )}
-
 
       {/* Auth banner */}
       <div className="relative z-10 bg-gradient-to-r from-slate-950 via-emerald-950/80 to-slate-950 text-slate-100 py-3 px-4 sm:px-6 border-b border-emerald-900/40 shadow-sm transition-colors duration-500">
@@ -476,12 +495,12 @@ export default function InterviewPage() {
               </>
             ) : (
               <Link
-                  href="/login"
-                  onClick={() => sessionStorage.setItem('wc_prev_path', window.location.pathname)}
-                  className="bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-1.5 px-4 rounded-xl shadow-sm transition-colors text-xs sm:text-sm"
-                >
-                  Masuk / Daftar
-                </Link>
+                href="/login"
+                onClick={() => sessionStorage.setItem('wc_prev_path', window.location.pathname)}
+                className="bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-1.5 px-4 rounded-xl shadow-sm transition-colors text-xs sm:text-sm"
+              >
+                Masuk / Daftar
+              </Link>
             )}
           </div>
         </div>
@@ -602,7 +621,11 @@ export default function InterviewPage() {
                   <CheckCircle className="w-5 h-5 text-emerald-400 shrink-0" />
                   <span className="text-sm font-bold">Dokumen siap dibuat</span>
                 </div>
-                <Link href={caseData.id ? `/result/${caseData.id}` : '#'} className="block">
+                {/* ✅ FIX Bug #2: onClick mark session sebagai completed sebelum pindah halaman */}
+                <Link
+                  href={caseData.id ? `/result/${caseData.id}` : '#'}
+                  onClick={caseData.id ? handleFinishCase : undefined}
+                >
                   <Button 
                     variant="primary" 
                     disabled={!caseData.id}
@@ -614,7 +637,7 @@ export default function InterviewPage() {
               </div>
             )}
 
-            {/* Redesigned Premium Uploaded Evidence List */}
+            {/* Evidence List */}
             {caseData.evidence && caseData.evidence.length > 0 && (
               <div className="p-5 bg-slate-900/40 border border-slate-800/80 rounded-2xl shadow-sm space-y-3">
                 <p className="text-sm font-extrabold text-slate-100 flex items-center gap-2 border-b border-slate-700 pb-2">

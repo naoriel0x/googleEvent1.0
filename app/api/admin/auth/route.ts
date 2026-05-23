@@ -4,7 +4,7 @@ import { cookies } from 'next/headers';
 
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL!;
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD!;
-const ADMIN_SECRET = process.env.ADMIN_SECRET!; // random string buat sign cookie
+const ADMIN_SECRET = process.env.ADMIN_SECRET!;
 
 // POST /api/admin/auth → login
 export async function POST(req: NextRequest) {
@@ -25,11 +25,11 @@ export async function POST(req: NextRequest) {
 
   const cookieStore = await cookies();
   cookieStore.set('admin_token', payload, {
-    httpOnly: true,       // tidak bisa dibaca JS client
+    httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
     sameSite: 'strict',
     maxAge: 60 * 60 * 8, // 8 jam
-    path: '/admin',
+    path: '/', // ✅ FIX: Sebelumnya '/admin' — browser tidak kirim cookie ke /api/admin/*
   });
 
   return NextResponse.json({ ok: true });
@@ -38,6 +38,9 @@ export async function POST(req: NextRequest) {
 // DELETE /api/admin/auth → logout
 export async function DELETE() {
   const cookieStore = await cookies();
-  cookieStore.delete({ name: 'admin_token', path: '/admin' });
+  cookieStore.delete({
+    name: 'admin_token',
+    path: '/', // ✅ FIX: Harus sama dengan path saat set, atau cookie tidak terhapus
+  });
   return NextResponse.json({ ok: true });
 }
