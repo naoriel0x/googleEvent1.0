@@ -476,62 +476,57 @@ export default function DashboardPage() {
     const initializeDashboard = async () => {
       try {
         // =====================================================
-        // CHECK GUEST MODE DULU
+        // NORMAL LOGIN FLOW (CEK SESSION DULU)
+        // =====================================================
+        const {
+          data: { session },
+          error: sessionError // Tangkap error session di sini
+        } = await supabaseClient.auth.getSession();
+
+        // Kalau ada error (misal: token basi / Invalid Refresh Token)
+        // Paksa sign out untuk membersihkan token yang nyangkut
+        if (sessionError) {
+          await supabaseClient.auth.signOut();
+        }
+
+        // Kalau ada session aktif, selalu prioritaskan login
+        if (session) {
+          if (!mounted) return;
+
+          localStorage.removeItem("wc_guest_mode");
+          document.cookie = 'wc_guest_mode=; path=/; max-age=0';
+          sessionStorage.removeItem("sessionId");
+
+          setUser(session.user);
+          setIsGuest(false);
+          await loadUserCases(session.access_token);
+          return;
+        }
+
+        // =====================================================
+        // CHECK GUEST MODE (KALAU TIDAK ADA SESSION)
         // =====================================================
         const guestMode = localStorage.getItem("wc_guest_mode") === "true";
 
-        // =====================================================
-        // GUEST MODE
-        // =====================================================
         if (guestMode) {
           if (!mounted) return;
 
           setIsGuest(true);
-
-          // Hapus user lama
           setUser(null);
-
-          // Reset seluruh dashboard
           resetDashboardState();
-
-          // Stop loading
           setLoading(false);
-
-          // STOP TOTAL
           return;
         }
 
         // =====================================================
-        // NORMAL LOGIN FLOW
+        // BELUM LOGIN DAN BUKAN GUEST
         // =====================================================
-        const {
-          data: { session },
-        } = await supabaseClient.auth.getSession();
+        sessionStorage.setItem(
+          "wc_prev_path",
+          window.location.pathname || "/dashboard",
+        );
 
-        // =====================================================
-        // BELUM LOGIN
-        // =====================================================
-        if (!session) {
-          sessionStorage.setItem(
-            "wc_prev_path",
-            window.location.pathname || "/dashboard",
-          );
-
-          router.replace("/login?redirect=/dashboard");
-
-          return;
-        }
-
-        // =====================================================
-        // LOGIN VALID
-        // =====================================================
-        if (!mounted) return;
-
-        setUser(session.user);
-
-        setIsGuest(false);
-
-        await loadUserCases(session.access_token);
+        router.replace("/login?redirect=/dashboard");
       } catch (err) {
         console.error("Dashboard init error:", err);
 
