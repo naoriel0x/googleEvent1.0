@@ -207,6 +207,9 @@ function LoginComponent() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    localStorage.removeItem('wc_guest_mode');
+    document.cookie = 'wc_guest_mode=; path=/; max-age=0';
+
     if (!email || !password) { setError('Email dan Password wajib diisi.'); return; }
     if (isSignUp) {
       if (!name) { setError('Nama wajib diisi.'); return; }
@@ -327,9 +330,6 @@ function LoginComponent() {
             </Link>
             <BackButton />
           </div>
-
-          {/* Desktop: back button above form (right side) */}
-
 
           {/* Form Header */}
           <div className="mb-8">
