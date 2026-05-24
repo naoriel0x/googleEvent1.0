@@ -1,7 +1,15 @@
 steps:
   # 1. Build Docker image dari Dockerfile
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['build', '-t', 'gcr.io/$PROJECT_ID/web-app:$COMMIT_SHA', '.']
+    args:
+      - 'build'
+      - '--build-arg'
+      - 'NEXT_PUBLIC_SUPABASE_URL=https://svowzhfomolsxhojlpsi.supabase.co'
+      - '--build-arg'
+      - 'NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN2b3d6aGZvbW9sc3hob2pscHNpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkwNjk0MzYsImV4cCI6MjA5NDY0NTQzNn0.IjluiaRXA2OwY_trpZFppZ6PNEkRS_-us9JWIGVxZAs'
+      - '-t'
+      - 'gcr.io/$PROJECT_ID/web-app:$COMMIT_SHA'
+      - '.'
 
   # 2. Push image container ke Container Registry
   - name: 'gcr.io/cloud-builders/docker'
@@ -20,6 +28,5 @@ steps:
       - 'asia-southeast2'
       - '--allow-unauthenticated'
 
-# Perbaikan struktur logging yang benar
 options:
   logging: 'CLOUD_LOGGING_ONLY'
