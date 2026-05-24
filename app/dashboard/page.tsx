@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { supabaseClient } from "@/lib/supabase";
+import { useAuth } from '@/lib/auth-context';
 import { Button } from "@/components/ui/Button";
 import { Spinner } from "@/components/ui/Spinner";
 import type { Case } from "@/types";
@@ -181,7 +182,7 @@ function DashboardFooter() {
   const platformLinks = [
     { label: "Mulai Dokumentasi", href: "/interview" },
     { label: "Legal Radar AI", href: "/legal" },
-    { label: "Cari LBH", href: "/lbh" },
+    { label: "Cari LBH", href: "/referral" },
     { label: "Bagikan Dokumen", href: "/result" },
     { label: "Dashboard", href: "/dashboard" },
   ];

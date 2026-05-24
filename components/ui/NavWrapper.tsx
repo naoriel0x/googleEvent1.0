@@ -8,7 +8,7 @@ export default function NavWrapper({ children }: { children: React.ReactNode }) 
   const pathname = usePathname();
 
   const hideTopNav = ['/', '/login', '/dashboard', /^\/share\//];
-  const hideBottomNav = ['/', '/login', '/interview', '/result', '/my-documents', '/admin', '/lbh', '/legal', /^\/share\//];
+  const hideBottomNav = ['/', '/login', '/interview', '/result', '/my-documents', '/admin', '/referral', '/legal', /^\/share\//];
 
   const shouldHideTop = hideTopNav.some(p =>
     typeof p === 'string' ? p === pathname : p.test(pathname)

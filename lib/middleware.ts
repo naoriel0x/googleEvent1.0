@@ -23,14 +23,18 @@ export async function middleware(request: NextRequest) {
   if (pathname.startsWith('/admin')) {
     if (pathname === '/admin/login') {
       const token = request.cookies.get('admin_token')?.value;
-      if (isAdminTokenValid(token)) {
+      
+      // ✅ FIX 1: Hapus "!". Kalau token valid, user adalah admin, langsung lempar ke /admin
+      if (await isAdminTokenValid(token)) {
         return NextResponse.redirect(new URL('/admin', request.url));
       }
       return NextResponse.next();
     }
 
     const token = request.cookies.get('admin_token')?.value;
-    if (!isAdminTokenValid(token)) {
+    
+    // ✅ FIX 2: Tambahkan "await". Kalau token tidak valid, suruh login dulu
+    if (!await isAdminTokenValid(token)) {
       return NextResponse.redirect(new URL('/admin/login', request.url));
     }
 
@@ -45,7 +49,7 @@ export async function middleware(request: NextRequest) {
   // ── Protected routes — cek Supabase session ──────────────────────────────────
   let response = NextResponse.next({ request: { headers: request.headers } });
 
-  // ✅ Pakai createServerClient (bukan createClient biasa) agar bisa baca cookie session
+  // ✅ Pakai createServerClient agar bisa baca cookie session dari Edge Runtime
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,

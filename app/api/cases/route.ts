@@ -1,6 +1,8 @@
+// app/api/cases/route.ts
 import { getSupabaseAdmin } from '@/lib/supabase';
 import type { Case } from '@/types';
 import { NextRequest, NextResponse } from 'next/server';
+import { validateAdminRequest } from '@/lib/admin-auth'; // ✅ FIX: Import fungsi validasi admin
 
 export async function POST(request: NextRequest): Promise<NextResponse<Case | { error: string }>> {
   try {
@@ -233,20 +235,45 @@ export async function GET(request: NextRequest): Promise<NextResponse<Case[] | C
     }
 
     // 4. Fallback: Get all cases (for admin)
-    const { data, error } = await supabaseAdmin
-      .from('cases')
-      .select()
-      .order('created_at', { ascending: false });
+    // ✅ FIX: Cek token admin sebelum ngasih seluruh data
+    const isAdmin = await validateAdminRequest();
+    
+    if (isAdmin) {
+      const { data, error } = await supabaseAdmin
+        .from('cases')
+        .select()
+        .order('created_at', { ascending: false });
 
-    if (error) {
-      console.error('Supabase error:', error);
-      return NextResponse.json(
-        { error: 'Failed to fetch cases' },
-        { status: 500 }
-      );
+      if (error) {
+        console.error('Supabase error:', error);
+        return NextResponse.json(
+          { error: 'Failed to fetch all cases' },
+          { status: 500 }
+        );
+      }
+
+      // Generate signed URLs dynamically (sama seperti section 2)
+      const updatedData = await Promise.all((data || []).map(async (item: Case) => {
+        if (item.document_url && !item.document_url.startsWith('http')) {
+          const { data: signedData } = await supabaseAdmin.storage
+            .from('documents')
+            .createSignedUrl(item.document_url, 3600);
+          if (signedData) {
+            item.document_url = signedData.signedUrl;
+          }
+        }
+        return item;
+      }));
+
+      return NextResponse.json(updatedData);
     }
 
-    return NextResponse.json(data || []);
+    // ✅ FIX: Jika bukan admin, tolak request untuk mencegah Information Disclosure
+    return NextResponse.json(
+      { error: 'Unauthorized Access' },
+      { status: 401 }
+    );
+
   } catch (error) {
     console.error('Cases GET error:', error);
     return NextResponse.json(

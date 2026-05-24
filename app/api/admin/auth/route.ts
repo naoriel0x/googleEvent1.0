@@ -1,10 +1,10 @@
 // app/api/admin/auth/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
+import { signAdminToken } from '@/lib/admin-auth';
 
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL!;
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD!;
-const ADMIN_SECRET = process.env.ADMIN_SECRET!;
 
 // POST /api/admin/auth → login
 export async function POST(req: NextRequest) {
@@ -20,16 +20,16 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Email atau password salah.' }, { status: 401 });
   }
 
-  // Buat token sederhana: base64(email:timestamp:secret)
-  const payload = Buffer.from(`${email}:${Date.now()}:${ADMIN_SECRET}`).toString('base64');
+  // ✅ FIX: Buat token menggunakan HMAC Web Crypto API (Secure)
+  const token = await signAdminToken(email);
 
   const cookieStore = await cookies();
-  cookieStore.set('admin_token', payload, {
+  cookieStore.set('admin_token', token, {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
     sameSite: 'strict',
     maxAge: 60 * 60 * 8, // 8 jam
-    path: '/', // ✅ FIX: Sebelumnya '/admin' — browser tidak kirim cookie ke /api/admin/*
+    path: '/',
   });
 
   return NextResponse.json({ ok: true });
@@ -40,7 +40,7 @@ export async function DELETE() {
   const cookieStore = await cookies();
   cookieStore.delete({
     name: 'admin_token',
-    path: '/', // ✅ FIX: Harus sama dengan path saat set, atau cookie tidak terhapus
+    path: '/',
   });
   return NextResponse.json({ ok: true });
 }
