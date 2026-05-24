@@ -24,14 +24,18 @@ export default async function proxy(request: NextRequest) {
   if (pathname.startsWith('/admin')) {
     if (pathname === '/admin/login') {
       const token = request.cookies.get('admin_token')?.value;
-      if (isAdminTokenValid(token)) {
+      
+      // ✅ FIX: Tambahkan await karena fungsinya sekarang async
+      if (await isAdminTokenValid(token)) {
         return NextResponse.redirect(new URL('/admin', request.url));
       }
       return NextResponse.next();
     }
 
     const token = request.cookies.get('admin_token')?.value;
-    if (!isAdminTokenValid(token)) {
+    
+    // ✅ FIX: Tambahkan await karena fungsinya sekarang async
+    if (!await isAdminTokenValid(token)) {
       return NextResponse.redirect(new URL('/admin/login', request.url));
     }
 
