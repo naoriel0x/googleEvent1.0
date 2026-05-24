@@ -181,7 +181,7 @@ function DashboardNavbar({
 function DashboardFooter() {
   const platformLinks = [
     { label: "Mulai Dokumentasi", href: "/interview" },
-    { label: "Legal Radar AI", href: "/legal" },
+    { label: "Legal Radar AI", href: "/legal-radar" },
     { label: "Cari LBH", href: "/referral" },
     { label: "Bagikan Dokumen", href: "/result" },
     { label: "Dashboard", href: "/dashboard" },
