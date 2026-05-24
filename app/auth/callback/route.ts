@@ -2,13 +2,14 @@ import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 import { NextResponse } from 'next/server'
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(request: Request) {
   const requestUrl = new URL(request.url)
   const code = requestUrl.searchParams.get('code')
   const redirect = requestUrl.searchParams.get('redirect') || '/dashboard'
 
   if (code) {
-    // Di Next.js terbaru, cookies() harus di-await terlebih dahulu
     const cookieStore = await cookies()
 
     const supabase = createServerClient(
@@ -24,17 +25,16 @@ export async function GET(request: Request) {
               cookiesToSet.forEach(({ name, value, options }) =>
                 cookieStore.set({ name, value, ...options })
               )
-            } catch {
-              // Di Server Component/Route Handler, error set cookie bisa diabaikan jika di-trigger oleh refresh session internal
-            }
+            } catch {}
           },
         },
       }
     )
     
-    // Tukar kode auth dari Facebook/Google menjadi session aktif
     await supabase.auth.exchangeCodeForSession(code)
   }
 
-  return NextResponse.redirect(new URL(redirect, requestUrl.origin))
+  // Pakai NEXT_PUBLIC_APP_URL sebagai origin biar tidak resolve ke 0.0.0.0
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || requestUrl.origin
+  return NextResponse.redirect(new URL(redirect, appUrl))
 }
