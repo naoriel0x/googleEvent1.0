@@ -74,7 +74,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<any>> {
     // Upsert case
     const { data, error }: any = await supabaseAdmin
       .from('cases')
-      .upsert(upsertData as any, { onConflict: 'id' }) // Bypass "cannot assign to parameter of type never[]"
+      .upsert(upsertData as any, { onConflict: 'session_id' })
       .select()
       .single();
 
