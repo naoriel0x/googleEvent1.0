@@ -3,6 +3,8 @@ import { getSupabaseAdmin } from '@/lib/supabase';
 import type { Case } from '@/types';
 import { NextRequest, NextResponse } from 'next/server';
 
+export const dynamic = 'force-dynamic';
+
 export async function POST(request: NextRequest): Promise<NextResponse<{ url: string } | { error: string }>> {
   try {
     const supabaseAdmin = getSupabaseAdmin();

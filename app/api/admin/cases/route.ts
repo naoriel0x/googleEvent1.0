@@ -4,6 +4,9 @@ import { getSupabaseAdmin } from '@/lib/supabase';
 import { validateAdminRequest } from '@/lib/admin-auth';
 import type { Case } from '@/types';
 
+// Paksa dynamic — jangan di-prerender saat build
+export const dynamic = 'force-dynamic';
+
 // GET /api/admin/cases → ambil semua kasus
 export async function GET() {
   if (!(await validateAdminRequest())) {
@@ -38,7 +41,6 @@ export async function DELETE(req: NextRequest) {
 
   const supabase = getSupabaseAdmin();
 
-  // Hapus dokumen PDF dari storage kalau ada
   const { data: caseData } = await supabase
     .from('cases')
     .select('document_url')
@@ -49,7 +51,6 @@ export async function DELETE(req: NextRequest) {
     await supabase.storage.from('documents').remove([caseData.document_url]);
   }
 
-  // Hapus row dari database
   const { error } = await supabase.from('cases').delete().eq('id', id);
 
   if (error) {
