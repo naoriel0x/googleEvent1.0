@@ -1,6 +1,4 @@
 import { GoogleAuth } from 'google-auth-library';
-import { readFileSync } from 'fs';
-import { join } from 'path';
 
 interface GeminiRequest {
   contents: Array<{
@@ -31,9 +29,27 @@ let auth: GoogleAuth | null = null;
 async function getAuth(): Promise<GoogleAuth> {
   if (auth) return auth;
 
-  const credentialsPath = join(process.cwd(), process.env.GOOGLE_APPLICATION_CREDENTIALS || './service-account.json');
-  const credentials = JSON.parse(readFileSync(credentialsPath, 'utf-8'));
+  // Coba dari base64 env var dulu (untuk Cloud Run)
+  const base64Credentials = process.env.GOOGLE_CREDENTIALS_BASE64;
+  if (base64Credentials) {
+    const credentials = JSON.parse(
+      Buffer.from(base64Credentials, 'base64').toString('utf-8')
+    );
+    auth = new GoogleAuth({
+      credentials,
+      scopes: ['https://www.googleapis.com/auth/cloud-platform'],
+    });
+    return auth;
+  }
 
+  // Fallback: baca dari file (untuk local development)
+  const { readFileSync } = await import('fs');
+  const { join } = await import('path');
+  const credentialsPath = join(
+    process.cwd(),
+    process.env.GOOGLE_APPLICATION_CREDENTIALS || './service-account.json'
+  );
+  const credentials = JSON.parse(readFileSync(credentialsPath, 'utf-8'));
   auth = new GoogleAuth({
     credentials,
     scopes: ['https://www.googleapis.com/auth/cloud-platform'],
@@ -46,7 +62,7 @@ async function getAccessToken(): Promise<string> {
   const authClient = await getAuth();
   const client = await authClient.getClient();
   const accessToken = await client.getAccessToken();
-  
+
   if (!accessToken.token) {
     throw new Error('Failed to get access token from Google Cloud');
   }
@@ -65,7 +81,7 @@ export async function generateContent(
     try {
       const accessToken = await getAccessToken();
       const projectId = process.env.GOOGLE_PROJECT_ID;
-      const model = process.env.GEMINI_MODEL || 'gemini-2.5-flash';
+      const model = process.env.GEMINI_MODEL || 'gemini-2.0-flash';
 
       if (!projectId) {
         throw new Error('GOOGLE_PROJECT_ID environment variable is not set');
@@ -77,22 +93,14 @@ export async function generateContent(
         contents: [
           {
             role: 'user',
-            parts: [
-              {
-                text: prompt,
-              },
-            ],
+            parts: [{ text: prompt }],
           },
         ],
       };
 
       if (systemPrompt) {
         requestBody.systemInstruction = {
-          parts: [
-            {
-              text: systemPrompt,
-            },
-          ],
+          parts: [{ text: systemPrompt }],
         };
       }
 
@@ -121,8 +129,10 @@ export async function generateContent(
       lastError = error instanceof Error ? error : new Error(String(error));
 
       if (attempt < maxRetries) {
-        // Wait before retrying (exponential backoff)
-        await new Promise((resolve) => setTimeout(resolve, 1000 * Math.pow(2, attempt)));
+        // Exponential backoff
+        await new Promise((resolve) =>
+          setTimeout(resolve, 1000 * Math.pow(2, attempt))
+        );
       }
     }
   }
