@@ -1,4 +1,4 @@
-// middleware.ts (atau proxy.ts tergantung setup project lo)
+// proxy.ts
 import { NextResponse, type NextRequest } from 'next/server';
 import { createServerClient } from '@supabase/ssr';
 import { isAdminTokenValid } from '@/lib/admin-auth';
@@ -13,8 +13,7 @@ export default async function proxy(request: NextRequest) {
   if (
     pathname.startsWith('/_next') ||
     pathname.startsWith('/api') ||
-    pathname.startsWith('/auth') || // ✅ FIX Bug #1: skip /auth/callback agar cookie session
-    // sempat di-set sebelum middleware ngecek session
+    pathname.startsWith('/auth') ||
     pathname.match(/\.(jpg|jpeg|png|gif|ico|svg|webp)$/)
   ) {
     return NextResponse.next();
@@ -24,8 +23,6 @@ export default async function proxy(request: NextRequest) {
   if (pathname.startsWith('/admin')) {
     if (pathname === '/admin/login') {
       const token = request.cookies.get('admin_token')?.value;
-      
-      // ✅ FIX: Tambahkan await karena fungsinya sekarang async
       if (await isAdminTokenValid(token)) {
         return NextResponse.redirect(new URL('/admin', request.url));
       }
@@ -33,8 +30,6 @@ export default async function proxy(request: NextRequest) {
     }
 
     const token = request.cookies.get('admin_token')?.value;
-    
-    // ✅ FIX: Tambahkan await karena fungsinya sekarang async
     if (!await isAdminTokenValid(token)) {
       return NextResponse.redirect(new URL('/admin/login', request.url));
     }
@@ -81,5 +76,6 @@ export default async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/((?!_next/static|_next/image|favicon\\.ico).*)'],
+  // Fix: exclude /api/* dari matcher supaya API routes tidak disentuh middleware
+  matcher: ['/((?!_next/static|_next/image|favicon\\.ico|api/).*)',],
 };
