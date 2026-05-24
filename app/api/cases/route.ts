@@ -2,9 +2,9 @@
 import { getSupabaseAdmin } from '@/lib/supabase';
 import type { Case } from '@/types';
 import { NextRequest, NextResponse } from 'next/server';
-import { validateAdminRequest } from '@/lib/admin-auth'; // ✅ FIX: Import fungsi validasi admin
+import { validateAdminRequest } from '@/lib/admin-auth'; 
 
-export async function POST(request: NextRequest): Promise<NextResponse<Case | { error: string }>> {
+export async function POST(request: NextRequest): Promise<NextResponse<any>> {
   try {
     const supabaseAdmin = getSupabaseAdmin();
     const body = await request.json();
@@ -44,7 +44,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<Case | { 
 
     // 2. Prevent updates if case is already completed (🔒 Locked)
     if (id) {
-      const { data: existingCase } = await supabaseAdmin
+      const { data: existingCase }: any = await supabaseAdmin
         .from('cases')
         .select('status, user_id')
         .eq('id', id)
@@ -70,9 +70,9 @@ export async function POST(request: NextRequest): Promise<NextResponse<Case | { 
     }
 
     // Upsert case
-    const { data, error } = await supabaseAdmin
+    const { data, error }: any = await supabaseAdmin
       .from('cases')
-      .upsert(upsertData, { onConflict: 'id' })
+      .upsert(upsertData as any, { onConflict: 'id' }) // Bypass "cannot assign to parameter of type never[]"
       .select()
       .single();
 
@@ -94,7 +94,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<Case | { 
   }
 }
 
-export async function GET(request: NextRequest): Promise<NextResponse<Case[] | Case | { error: string }>> {
+export async function GET(request: NextRequest): Promise<NextResponse<any>> {
   try {
     const supabaseAdmin = getSupabaseAdmin();
     const { searchParams } = new URL(request.url);
@@ -127,7 +127,7 @@ export async function GET(request: NextRequest): Promise<NextResponse<Case[] | C
       }
 
       // Get specific case by ID
-      const { data, error } = await supabaseAdmin
+      const { data, error }: any = await supabaseAdmin
         .from('cases')
         .select()
         .eq('id', caseId)
@@ -141,7 +141,6 @@ export async function GET(request: NextRequest): Promise<NextResponse<Case[] | C
         );
       }
 
-      // Generate signed URL dynamically if document_url is a private path
       if (data && data.document_url && !data.document_url.startsWith('http')) {
         const { data: signedData } = await supabaseAdmin.storage
           .from('documents')
@@ -154,9 +153,9 @@ export async function GET(request: NextRequest): Promise<NextResponse<Case[] | C
       return NextResponse.json(data);
     }
 
-    // 2. Fetch user cases for Dashboard (when bearer auth is provided and no specific sessionId or caseId is specified)
+    // 2. Fetch user cases for Dashboard
     if (userId && !sessionId) {
-      const { data, error } = await supabaseAdmin
+      const { data, error }: any = await supabaseAdmin
         .from('cases')
         .select()
         .eq('user_id', userId)
@@ -170,8 +169,7 @@ export async function GET(request: NextRequest): Promise<NextResponse<Case[] | C
         );
       }
 
-      // Generate signed URLs dynamically for any cases that have private document paths
-      const updatedData = await Promise.all((data || []).map(async (item: Case) => {
+      const updatedData = await Promise.all((data || []).map(async (item: any) => {
         if (item.document_url && !item.document_url.startsWith('http')) {
           const { data: signedData } = await supabaseAdmin.storage
             .from('documents')
@@ -188,8 +186,7 @@ export async function GET(request: NextRequest): Promise<NextResponse<Case[] | C
 
     // 3. Fetch case by session ID
     if (sessionId) {
-      // Get case by session ID
-      const { data, error } = await supabaseAdmin
+      const { data, error }: any = await supabaseAdmin
         .from('cases')
         .select()
         .eq('session_id', sessionId)
@@ -205,7 +202,6 @@ export async function GET(request: NextRequest): Promise<NextResponse<Case[] | C
         );
       }
 
-      // Return empty case jika tidak ada
       if (!data) {
         return NextResponse.json({
           id: '',
@@ -218,10 +214,9 @@ export async function GET(request: NextRequest): Promise<NextResponse<Case[] | C
           completeness_score: 0,
           created_at: new Date().toISOString(),
           updated_at: new Date().toISOString(),
-        } as Case);
+        });
       }
 
-      // Generate signed URL dynamically if document_url is a private path
       if (data && data.document_url && !data.document_url.startsWith('http')) {
         const { data: signedData } = await supabaseAdmin.storage
           .from('documents')
@@ -235,11 +230,11 @@ export async function GET(request: NextRequest): Promise<NextResponse<Case[] | C
     }
 
     // 4. Fallback: Get all cases (for admin)
-    // ✅ FIX: Cek token admin sebelum ngasih seluruh data
+    // Diubah kembali menjadi tanpa argumen sesuai lib asli proyekmu
     const isAdmin = await validateAdminRequest();
     
     if (isAdmin) {
-      const { data, error } = await supabaseAdmin
+      const { data, error }: any = await supabaseAdmin
         .from('cases')
         .select()
         .order('created_at', { ascending: false });
@@ -252,8 +247,7 @@ export async function GET(request: NextRequest): Promise<NextResponse<Case[] | C
         );
       }
 
-      // Generate signed URLs dynamically (sama seperti section 2)
-      const updatedData = await Promise.all((data || []).map(async (item: Case) => {
+      const updatedData = await Promise.all((data || []).map(async (item: any) => {
         if (item.document_url && !item.document_url.startsWith('http')) {
           const { data: signedData } = await supabaseAdmin.storage
             .from('documents')
@@ -268,7 +262,6 @@ export async function GET(request: NextRequest): Promise<NextResponse<Case[] | C
       return NextResponse.json(updatedData);
     }
 
-    // ✅ FIX: Jika bukan admin, tolak request untuk mencegah Information Disclosure
     return NextResponse.json(
       { error: 'Unauthorized Access' },
       { status: 401 }
