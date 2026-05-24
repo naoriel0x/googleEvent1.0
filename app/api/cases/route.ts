@@ -4,6 +4,8 @@ import type { Case } from '@/types';
 import { NextRequest, NextResponse } from 'next/server';
 import { validateAdminRequest } from '@/lib/admin-auth'; 
 
+export const dynamic = 'force-dynamic';
+
 export async function POST(request: NextRequest): Promise<NextResponse<any>> {
   try {
     const supabaseAdmin = getSupabaseAdmin();

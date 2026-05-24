@@ -2,6 +2,8 @@ import { generateContent } from '@/lib/gemini';
 import type { Case, Message } from '@/types';
 import { NextRequest, NextResponse } from 'next/server';
 
+export const dynamic = 'force-dynamic';
+
 const SYSTEM_PROMPT = `Anda adalah pendamping dokumentasi yang empatikal dan profesional untuk platform WitnessChain. Tugas Anda adalah membantu korban penggusuran, sengketa lahan, dan pelanggaran hak merekam kejadian mereka secara terstruktur dan kredibel.
 
 PEDOMAN INTERVIEW (SANGAT PENTING):

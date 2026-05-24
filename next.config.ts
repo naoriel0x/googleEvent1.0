@@ -1,6 +1,7 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  output: 'standalone',
   // @ts-ignore
   allowedDevOrigins: ['192.168.1.4'],
   images: {
@@ -19,8 +20,6 @@ const nextConfig: NextConfig = {
       },
     ],
   },
-
-  // TAMBAHAN BARU: Bypass ketatnya TypeScript saat proses build di Cloud
   typescript: {
     ignoreBuildErrors: true,
   },
