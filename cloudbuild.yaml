@@ -1,9 +1,9 @@
 steps:
-  # 1. Build Docker image dari Dockerfile di atas
+  # 1. Build Docker image dari Dockerfile
   - name: 'gcr.io/cloud-builders/docker'
     args: ['build', '-t', 'gcr.io/$PROJECT_ID/web-app:$COMMIT_SHA', '.']
 
-  # 2. Push image container-nya ke Container Registry Google
+  # 2. Push image container ke Container Registry
   - name: 'gcr.io/cloud-builders/docker'
     args: ['push', 'gcr.io/$PROJECT_ID/web-app:$COMMIT_SHA']
 
@@ -13,12 +13,13 @@ steps:
     args:
       - 'run'
       - 'deploy'
-      - 'developmentweb-service' # Ini akan jadi nama service Cloud Run kamu
+      - 'developmentweb-service'
       - '--image'
       - 'gcr.io/$PROJECT_ID/web-app:$COMMIT_SHA'
       - '--region'
-      - 'asia-southeast2' # Menggunakan server Jakarta biar latensinya rendah
-      - '--allow-unauthenticated' # Akses publik biar bisa dibuka semua orang
+      - 'asia-southeast2'
+      - '--allow-unauthenticated'
 
+# Perbaikan struktur logging yang benar
 options:
-logging: CLOUD_LOGGING_ONLY
+  logging: 'CLOUD_LOGGING_ONLY'
