@@ -1,36 +1,149 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+<div align="center">
+
+# ⚖️ WitnessChain
+
+**A digital evidence documentation platform for victims of forced evictions, land disputes, and civil rights violations in Indonesia.**
+
+Built for [#JuaraVibeCoding](https://gdg.community.dev/events/details/google-gdg-cloud-jakarta-presents-juaravibecoding-kick-off-event/) — a Google for Developers event · _Code Less, Build More_
+
+[![Next.js](https://img.shields.io/badge/Next.js-15-black?logo=next.js)](https://nextjs.org)
+[![Gemini](https://img.shields.io/badge/Gemini-2.5_Flash-4285F4?logo=google)](https://ai.google.dev)
+[![Supabase](https://img.shields.io/badge/Supabase-Database-3ECF8E?logo=supabase)](https://supabase.com)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind-v4-38BDF8?logo=tailwindcss)](https://tailwindcss.com)
+
+</div>
+
+---
+
+## About
+
+WitnessChain helps citizens facing rights violations document their cases digitally — **free, no login required, in under 30 minutes** — and produces a legally-formatted document ready to be submitted to a legal aid organization (LBH).
+
+Users simply describe what happened through an AI chat interface. The system automatically extracts key facts, calculates case completeness, and generates a digitally-signed PDF that can be used as initial evidence.
+
+---
+
+## Features
+
+| Feature | Description |
+|---|---|
+| 🤖 **AI Interview** | Guided chat with Gemini 2.5 Flash that empathetically walks users through fact-gathering |
+| 📄 **Document Generation** | Professional PDF output with SHA-256 hash verification for each piece of evidence |
+| ⚖️ **Legal Radar** | AI analysis of potentially violated articles and recommended legal steps |
+| 🗺️ **LBH Referral** | Interactive map of 19 legal aid organizations across Indonesia with specialization filters |
+| 🛡️ **Admin Dashboard** | Case management with bulk selection, bulk deletion, and statistics overview |
+
+---
+
+## Tech Stack
+
+- **Framework** — Next.js 15 (App Router)
+- **AI** — Google Gemini 2.5 Flash via Vertex AI
+- **Database & Storage** — Supabase (PostgreSQL + Storage Buckets)
+- **Styling** — Tailwind CSS v4
+- **PDF** — jsPDF
+- **Maps** — Google Maps Embed API
+
+---
 
 ## Getting Started
 
-First, run the development server:
+### 1. Clone & Install
+
+```bash
+git clone https://github.com/username/witnesschain.git
+cd witnesschain
+npm install
+```
+
+### 2. Environment Variables
+
+Create a `.env.local` file at the project root:
+
+```env
+# Google Cloud / Gemini
+GOOGLE_APPLICATION_CREDENTIALS=./service-account.json
+GOOGLE_PROJECT_ID=your-project-id
+GOOGLE_LOCATION=global
+GEMINI_MODEL=gemini-2.5-flash
+GEMINI_API_KEY=your-gemini-api-key
+
+# Supabase
+NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
+SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
+
+# Google Maps
+NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=your-maps-api-key
+```
+
+> ⚠️ Never commit `.env.local` to your repository. It is already included in `.gitignore`.
+
+### 3. Database Setup
+
+```bash
+# Using Supabase CLI
+npx supabase db push
+
+# Or manually: copy and run the contents of supabase/schema.sql in the Supabase SQL Editor
+```
+
+### 4. Run the Development Server
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+---
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Project Structure
 
-## Learn More
+```
+witnesschain/
+├── app/
+│   ├── api/                  # Route handlers (interview, cases, document, legal-radar)
+│   ├── interview/            # AI chat interview page
+│   ├── result/[id]/          # Case result & PDF download page
+│   ├── legal-radar/          # AI legal analysis page
+│   ├── referral/             # LBH map & directory page
+│   ├── admin/                # Admin dashboard
+│   └── page.tsx              # Landing page
+├── components/
+│   ├── ui/                   # Reusable UI components (Button, Badge, Card, etc.)
+│   ├── interview/            # ChatBubble, EvidenceUpload, ProgressTracker, etc.
+│   └── ...
+├── lib/
+│   ├── gemini.ts             # Gemini AI client & helpers
+│   ├── supabase.ts           # Supabase clients (anon + admin)
+│   ├── pdf.ts                # PDF generation
+│   └── maps.ts               # Maps & distance calculation helpers
+├── types/index.ts            # TypeScript type definitions
+├── data/lbh.json             # Static data for 19 LBH organizations
+└── supabase/schema.sql       # Database schema
+```
 
-To learn more about Next.js, take a look at the following resources:
+---
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## About #JuaraVibeCoding
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+[#JuaraVibeCoding](https://gdg.community.dev/events/details/google-gdg-cloud-jakarta-presents-juaravibecoding-kick-off-event/) is a **Google for Developers** program that invites everyone — regardless of coding background — to build real applications using AI.
 
-## Deploy on Vercel
+> _"Your ideas are the only 'code' you need."_
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+WitnessChain was built as part of this program as a demonstration that vibe coding can produce tools with genuine social impact.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+---
+
+## Disclaimer
+
+Documents generated by WitnessChain are not a substitute for consultation with a lawyer or legal aid organization. This platform assists with initial documentation only and does not provide formal legal advice.
+
+---
+
+<div align="center">
+
+Made with ❤️ for #JuaraVibeCoding by Google for Developers
+
+</div>

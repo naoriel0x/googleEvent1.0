@@ -7,21 +7,25 @@ import type { Case } from '@/types';
 import {
   Shield, FileText, CheckCircle, Clock, TrendingUp,
   Trash2, ExternalLink, LogOut, Search, AlertTriangle,
-  RefreshCw, X, Lock,
+  RefreshCw, X, Lock, Square, CheckSquare, MinusSquare,
 } from 'lucide-react';
 
 // ─── Confirm Delete Modal ─────────────────────────────────────────────────────
 function ConfirmDeleteModal({
-  caseItem,
+  count,
+  singleItem,
   onConfirm,
   onCancel,
   loading,
 }: {
-  caseItem: Case;
+  count: number;
+  singleItem?: Case;
   onConfirm: () => void;
   onCancel: () => void;
   loading: boolean;
 }) {
+  const isBulk = count > 1;
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
       <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onCancel} />
@@ -31,25 +35,40 @@ function ConfirmDeleteModal({
             <div className="p-2 bg-red-500/10 border border-red-500/20 rounded-xl">
               <Trash2 className="w-5 h-5 text-red-400" />
             </div>
-            <h3 className="font-bold text-white">Hapus Dokumen</h3>
+            <h3 className="font-bold text-white">
+              {isBulk ? `Hapus ${count} Dokumen` : 'Hapus Dokumen'}
+            </h3>
           </div>
           <button onClick={onCancel} className="text-slate-500 hover:text-slate-300 transition-colors">
             <X className="w-5 h-5" />
           </button>
         </div>
 
-        <div className="bg-slate-950 border border-slate-800 rounded-xl p-3 mb-4">
-          <p className="text-[10px] font-mono text-slate-500 mb-1">#{caseItem.id.substring(0, 8).toUpperCase()}</p>
-          <p className="text-sm font-bold text-white">
-            {caseItem.violation_type?.replace(/_/g, ' ').toUpperCase() || 'Dokumentasi Kasus'}
-          </p>
-          <p className="text-xs text-slate-500 mt-0.5">{caseItem.reporter_name || 'Anonim'}</p>
-        </div>
+        {/* Single item preview */}
+        {singleItem && !isBulk && (
+          <div className="bg-slate-950 border border-slate-800 rounded-xl p-3 mb-4">
+            <p className="text-[10px] font-mono text-slate-500 mb-1">#{singleItem.id.substring(0, 8).toUpperCase()}</p>
+            <p className="text-sm font-bold text-white">
+              {singleItem.violation_type?.replace(/_/g, ' ').toUpperCase() || 'Dokumentasi Kasus'}
+            </p>
+            <p className="text-xs text-slate-500 mt-0.5">{singleItem.reporter_name || 'Anonim'}</p>
+          </div>
+        )}
+
+        {/* Bulk info */}
+        {isBulk && (
+          <div className="bg-slate-950 border border-slate-800 rounded-xl p-3 mb-4 text-center">
+            <p className="text-3xl font-black text-red-400">{count}</p>
+            <p className="text-xs text-slate-400 mt-0.5">dokumen akan dihapus sekaligus</p>
+          </div>
+        )}
 
         <div className="flex items-start gap-2 bg-amber-950/30 border border-amber-800/40 rounded-xl p-3 mb-5">
           <AlertTriangle className="w-4 h-4 text-amber-400 flex-shrink-0 mt-0.5" />
           <p className="text-xs text-amber-300">
-            Dokumen ini akan dihapus permanen dari database dan storage. Tindakan ini tidak bisa dibatalkan.
+            {isBulk
+              ? `Semua ${count} dokumen ini akan dihapus permanen dari database dan storage. Tindakan ini tidak bisa dibatalkan.`
+              : 'Dokumen ini akan dihapus permanen dari database dan storage. Tindakan ini tidak bisa dibatalkan.'}
           </p>
         </div>
 
@@ -70,11 +89,30 @@ function ConfirmDeleteModal({
                 <span className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                 Menghapus...
               </span>
-            ) : 'Ya, Hapus'}
+            ) : `Ya, Hapus${isBulk ? ` (${count})` : ''}`}
           </button>
         </div>
       </div>
     </div>
+  );
+}
+
+// ─── Checkbox Cell ────────────────────────────────────────────────────────────
+function Checkbox({ checked, indeterminate, onChange }: {
+  checked: boolean;
+  indeterminate?: boolean;
+  onChange: () => void;
+}) {
+  const Icon = indeterminate ? MinusSquare : checked ? CheckSquare : Square;
+  return (
+    <button
+      onClick={onChange}
+      className={`transition-colors ${
+        checked || indeterminate ? 'text-emerald-400' : 'text-slate-600 hover:text-slate-400'
+      }`}
+    >
+      <Icon className="w-4 h-4" />
+    </button>
   );
 }
 
@@ -84,7 +122,12 @@ export default function AdminPage() {
   const [cases, setCases] = useState<Case[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
-  const [deleteTarget, setDeleteTarget] = useState<Case | null>(null);
+  const [selected, setSelected] = useState<Set<string>>(new Set());
+  const [deleteModal, setDeleteModal] = useState<
+    | { mode: 'single'; item: Case }
+    | { mode: 'bulk' }
+    | null
+  >(null);
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [toast, setToast] = useState<{ msg: string; type: 'success' | 'error' } | null>(null);
 
@@ -95,12 +138,10 @@ export default function AdminPage() {
 
   const loadCases = useCallback(async () => {
     setLoading(true);
+    setSelected(new Set());
     try {
       const res = await fetch('/api/admin/cases');
-      if (res.status === 401) {
-        router.replace('/admin/login');
-        return;
-      }
+      if (res.status === 401) { router.replace('/admin/login'); return; }
       const data = await res.json();
       if (Array.isArray(data)) setCases(data);
     } catch {
@@ -117,23 +158,84 @@ export default function AdminPage() {
     router.replace('/admin/login');
   };
 
-  const handleDelete = async () => {
-    if (!deleteTarget) return;
+  // ── Selection helpers ───────────────────────────────────────────────────────
+  const filtered = cases.filter(c =>
+    (c.reporter_name || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (c.violation_type || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (c.incident_location || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+    c.id.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const allFilteredSelected = filtered.length > 0 && filtered.every(c => selected.has(c.id));
+  const someFilteredSelected = filtered.some(c => selected.has(c.id)) && !allFilteredSelected;
+
+  const toggleSelectAll = () => {
+    if (allFilteredSelected) {
+      // deselect all filtered
+      setSelected(prev => {
+        const next = new Set(prev);
+        filtered.forEach(c => next.delete(c.id));
+        return next;
+      });
+    } else {
+      // select all filtered
+      setSelected(prev => {
+        const next = new Set(prev);
+        filtered.forEach(c => next.add(c.id));
+        return next;
+      });
+    }
+  };
+
+  const toggleOne = (id: string) => {
+    setSelected(prev => {
+      const next = new Set(prev);
+      next.has(id) ? next.delete(id) : next.add(id);
+      return next;
+    });
+  };
+
+  // ── Delete ──────────────────────────────────────────────────────────────────
+  const executeDelete = async (ids: string[]) => {
     setDeleteLoading(true);
     try {
-      const res = await fetch(`/api/admin/cases?id=${deleteTarget.id}`, { method: 'DELETE' });
-      if (!res.ok) {
-        const d = await res.json();
-        showToast(d.error || 'Gagal menghapus.', 'error');
-        return;
+      // Fire requests in parallel
+      const results = await Promise.all(
+        ids.map(id => fetch(`/api/admin/cases?id=${id}`, { method: 'DELETE' }))
+      );
+      const failedCount = results.filter(r => !r.ok).length;
+
+      if (failedCount === 0) {
+        setCases(prev => prev.filter(c => !ids.includes(c.id)));
+        setSelected(prev => {
+          const next = new Set(prev);
+          ids.forEach(id => next.delete(id));
+          return next;
+        });
+        showToast(
+          ids.length === 1
+            ? 'Dokumen berhasil dihapus.'
+            : `${ids.length} dokumen berhasil dihapus.`,
+          'success'
+        );
+      } else {
+        showToast(`${failedCount} dokumen gagal dihapus.`, 'error');
+        loadCases(); // re-sync
       }
-      setCases(prev => prev.filter(c => c.id !== deleteTarget.id));
-      showToast('Dokumen berhasil dihapus.', 'success');
-      setDeleteTarget(null);
     } catch {
       showToast('Terjadi kesalahan.', 'error');
     } finally {
       setDeleteLoading(false);
+      setDeleteModal(null);
+    }
+  };
+
+  const handleConfirmDelete = () => {
+    if (!deleteModal) return;
+    if (deleteModal.mode === 'single') {
+      executeDelete([deleteModal.item.id]);
+    } else {
+      executeDelete([...selected]);
     }
   };
 
@@ -146,13 +248,6 @@ export default function AdminPage() {
       : 0,
   };
 
-  const filtered = cases.filter(c =>
-    (c.reporter_name || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
-    (c.violation_type || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
-    (c.incident_location || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
-    c.id.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
   return (
     <div className="min-h-dvh bg-slate-950 text-white relative">
       {/* Background blobs */}
@@ -162,28 +257,29 @@ export default function AdminPage() {
       {/* Toast */}
       {toast && (
         <div className={`fixed top-4 right-4 z-50 px-4 py-3 rounded-xl text-sm font-semibold shadow-lg transition-all ${
-          toast.type === 'success'
-            ? 'bg-emerald-600 text-white'
-            : 'bg-red-600 text-white'
+          toast.type === 'success' ? 'bg-emerald-600 text-white' : 'bg-red-600 text-white'
         }`}>
           {toast.msg}
         </div>
       )}
 
       {/* Delete Modal */}
-      {deleteTarget && (
+      {deleteModal && (
         <ConfirmDeleteModal
-          caseItem={deleteTarget}
-          onConfirm={handleDelete}
-          onCancel={() => setDeleteTarget(null)}
+          count={deleteModal.mode === 'single' ? 1 : selected.size}
+          singleItem={deleteModal.mode === 'single' ? deleteModal.item : undefined}
+          onConfirm={handleConfirmDelete}
+          onCancel={() => setDeleteModal(null)}
           loading={deleteLoading}
         />
       )}
 
       {/* Navbar */}
       <div className="sticky top-0 z-40 w-full flex justify-center pt-3 pb-1 pointer-events-none">
-        <header className="pointer-events-auto flex items-center justify-between gap-4 px-4 py-2.5 rounded-2xl border bg-slate-900/85 border-slate-700/70 backdrop-blur-2xl shadow-2xl"
-          style={{ width: 'min(860px, calc(100vw - 2rem))' }}>
+        <header
+          className="pointer-events-auto flex items-center justify-between gap-4 px-4 py-2.5 rounded-2xl border bg-slate-900/85 border-slate-700/70 backdrop-blur-2xl shadow-2xl"
+          style={{ width: 'min(860px, calc(100vw - 2rem))' }}
+        >
           <div className="flex items-center gap-2">
             <div className="p-1.5 bg-emerald-500/15 border border-emerald-500/25 rounded-xl">
               <Shield className="w-3.5 h-3.5 text-emerald-400" />
@@ -251,26 +347,59 @@ export default function AdminPage() {
 
             {/* Table */}
             <div className="bg-slate-900/40 border border-slate-800/80 rounded-3xl shadow-xl overflow-hidden">
-              {/* Search bar */}
-              <div className="p-5 border-b border-slate-800/60 flex items-center gap-3">
-                <div className="relative flex-1 max-w-xs">
+
+              {/* Toolbar */}
+              <div className="p-5 border-b border-slate-800/60 flex items-center gap-3 flex-wrap">
+                {/* Search */}
+                <div className="relative flex-1 min-w-[180px] max-w-xs">
                   <Search className="absolute left-3 top-2.5 w-4 h-4 text-slate-500" />
                   <input
                     type="text"
                     value={searchTerm}
-                    onChange={e => setSearchTerm(e.target.value)}
+                    onChange={e => { setSearchTerm(e.target.value); setSelected(new Set()); }}
                     placeholder="Cari kasus..."
                     className="w-full pl-9 pr-4 py-2 bg-slate-950 border border-slate-800 focus:border-emerald-500 focus:outline-none rounded-xl text-xs placeholder-slate-600 text-white transition-all"
                   />
                 </div>
+
                 <span className="text-xs text-slate-500 font-semibold">{filtered.length} kasus</span>
+
+                {/* Bulk action bar — appears when something is selected */}
+                {selected.size > 0 && (
+                  <div className="flex items-center gap-2 ml-auto">
+                    <span className="text-xs font-bold text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-1 rounded-lg">
+                      {selected.size} dipilih
+                    </span>
+                    <button
+                      onClick={() => setSelected(new Set())}
+                      className="text-xs text-slate-400 hover:text-white border border-slate-700 hover:border-slate-600 px-2.5 py-1 rounded-lg transition-all"
+                    >
+                      Batal pilih
+                    </button>
+                    <button
+                      onClick={() => setDeleteModal({ mode: 'bulk' })}
+                      className="flex items-center gap-1.5 text-xs font-bold text-white bg-red-600 hover:bg-red-500 px-3 py-1.5 rounded-lg transition-all"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                      Hapus {selected.size} kasus
+                    </button>
+                  </div>
+                )}
               </div>
 
-              {/* Table content */}
+              {/* Table */}
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead>
                     <tr className="border-b border-slate-800/60">
+                      {/* Select-all checkbox */}
+                      <th className="px-4 py-3 w-10">
+                        <Checkbox
+                          checked={allFilteredSelected}
+                          indeterminate={someFilteredSelected}
+                          onChange={toggleSelectAll}
+                        />
+                      </th>
                       {['ID', 'Jenis', 'Pelapor', 'Lokasi', 'Tanggal Dibuat', 'Status', 'Skor', 'Aksi'].map(h => (
                         <th key={h} className="px-4 py-3 text-left text-[10px] font-extrabold text-slate-500 uppercase tracking-wider whitespace-nowrap">
                           {h}
@@ -281,15 +410,30 @@ export default function AdminPage() {
                   <tbody className="divide-y divide-slate-800/40">
                     {filtered.length === 0 ? (
                       <tr>
-                        <td colSpan={8} className="px-4 py-16 text-center text-slate-500 text-sm">
+                        <td colSpan={9} className="px-4 py-16 text-center text-slate-500 text-sm">
                           Tidak ada kasus ditemukan.
                         </td>
                       </tr>
                     ) : (
                       filtered.map(item => {
+                        const isSelected = selected.has(item.id);
                         const isCompleted = item.status === 'completed';
                         return (
-                          <tr key={item.id} className="hover:bg-slate-800/20 transition-colors group">
+                          <tr
+                            key={item.id}
+                            className={`transition-colors group ${
+                              isSelected
+                                ? 'bg-emerald-950/20 hover:bg-emerald-950/30'
+                                : 'hover:bg-slate-800/20'
+                            }`}
+                          >
+                            {/* Row checkbox */}
+                            <td className="px-4 py-3">
+                              <Checkbox
+                                checked={isSelected}
+                                onChange={() => toggleOne(item.id)}
+                              />
+                            </td>
                             <td className="px-4 py-3">
                               <span className="font-mono text-[10px] text-slate-500 bg-slate-950 px-2 py-0.5 rounded border border-slate-800">
                                 #{item.id.substring(0, 8).toUpperCase()}
@@ -347,7 +491,7 @@ export default function AdminPage() {
                                   <ExternalLink className="w-3.5 h-3.5" />
                                 </button>
                                 <button
-                                  onClick={() => setDeleteTarget(item)}
+                                  onClick={() => setDeleteModal({ mode: 'single', item })}
                                   className="p-1.5 text-slate-500 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-all"
                                   title="Hapus Dokumen"
                                 >

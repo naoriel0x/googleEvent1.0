@@ -18,8 +18,7 @@ const outfit = Outfit({
 
 export const metadata: Metadata = {
   title: 'WitnessChain — Dokumentasi Bukti Digital',
-  description:
-    'Platform dokumentasi bukti digital untuk korban penggusuran, sengketa lahan, dan pelanggaran hak warga Indonesia. Bantu menyusun berkas kasus untuk konsultasi LBH atau lembaga terkait.',
+  description: 'Platform dokumentasi bukti digital untuk korban penggusuran, sengketa lahan, dan pelanggaran hak warga Indonesia. Bantu menyusun berkas kasus untuk konsultasi LBH atau lembaga terkait.',
   keywords: [
     'documenter',
     'bukti digital',
@@ -29,6 +28,14 @@ export const metadata: Metadata = {
     'sengketa lahan',
     'Indonesia',
   ],
+  icons: {
+    icon: [
+      { url: '/favicon.ico' },
+      { url: '/favicon-32.png', sizes: '32x32', type: 'image/png' },
+      { url: '/favicon.svg', type: 'image/svg+xml' },
+    ],
+    apple: '/favicon-512.png',
+  },
 };
 
 export default function RootLayout({

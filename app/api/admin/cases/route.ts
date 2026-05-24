@@ -1,40 +1,12 @@
 // app/api/admin/cases/route.ts
 import { NextRequest, NextResponse } from 'next/server';
-import { cookies } from 'next/headers';
 import { getSupabaseAdmin } from '@/lib/supabase';
-
-const ADMIN_SECRET = process.env.ADMIN_SECRET!;
-
-// Helper: validasi admin cookie
-async function isAdminAuthorized(): Promise<boolean> {
-  const cookieStore = await cookies();
-  const token = cookieStore.get('admin_token')?.value;
-  if (!token) return false;
-
-  try {
-    const decoded = Buffer.from(token, 'base64').toString('utf-8');
-    const parts = decoded.split(':');
-    if (parts.length < 3) return false;
-
-    const secret = parts[parts.length - 1];
-    const timestamp = parseInt(parts[parts.length - 2]);
-
-    // Cek secret cocok
-    if (secret !== ADMIN_SECRET) return false;
-
-    // Cek token belum expired (8 jam)
-    const age = Date.now() - timestamp;
-    if (age > 1000 * 60 * 60 * 8) return false;
-
-    return true;
-  } catch {
-    return false;
-  }
-}
+import { validateAdminRequest } from '@/lib/admin-auth';
+import type { Case } from '@/types';
 
 // GET /api/admin/cases → ambil semua kasus
 export async function GET() {
-  if (!(await isAdminAuthorized())) {
+  if (!(await validateAdminRequest())) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
@@ -53,7 +25,7 @@ export async function GET() {
 
 // DELETE /api/admin/cases?id=xxx → hapus kasus by id
 export async function DELETE(req: NextRequest) {
-  if (!(await isAdminAuthorized())) {
+  if (!(await validateAdminRequest())) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
@@ -71,7 +43,7 @@ export async function DELETE(req: NextRequest) {
     .from('cases')
     .select('document_url')
     .eq('id', id)
-    .single();
+    .single() as { data: { document_url: string | null } | null; error: unknown };
 
   if (caseData?.document_url && !caseData.document_url.startsWith('http')) {
     await supabase.storage.from('documents').remove([caseData.document_url]);
