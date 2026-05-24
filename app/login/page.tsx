@@ -44,26 +44,28 @@ function BackButton() {
   const [href, setHref] = useState('/');
   const [label, setLabel] = useState('← Kembali');
 
-  useEffect(() => {
-    // Ambil path sebelumnya yang disimpan sebelum redirect ke login
-    const prev = sessionStorage.getItem('wc_prev_path');
-    
-    if (prev && prev !== '/login') {
-      setHref(prev);
-      // Buat label yang friendly
-      const labelMap: Record<string, string> = {
-        '/': '← Kembali ke Halaman Utama',
-        '/dashboard': '← Kembali ke Dashboard',
-        '/legal': '← Kembali ke Legal',
-        '/referral': '← Kembali ke Cari LBH',
-        '/interview': '← Kembali ke Wawancara',
-      };
-      setLabel(labelMap[prev] || `← Kembali`);
-    } else {
-      setHref('/');
-      setLabel('← Kembali ke Halaman Utama');
-    }
-  }, []);
+useEffect(() => {
+  const prev = sessionStorage.getItem('wc_prev_path');
+  const params = new URLSearchParams(window.location.search);
+  const hasRedirectParam = params.has('redirect');
+
+  // Kalau ada ?redirect= = dipaksa middleware → back ke intro
+  // Kalau prev null = tidak ada history → back ke intro
+  if (prev && prev !== '/login' && !hasRedirectParam) {
+    setHref(prev);
+    const labelMap: Record<string, string> = {
+      '/': '← Kembali ke Halaman Utama',
+      '/dashboard': '← Kembali ke Dashboard',
+      '/legal-radar': '← Kembali ke Legal Radar',
+      '/referral': '← Kembali ke Cari LBH',
+      '/interview': '← Kembali ke Wawancara',
+    };
+    setLabel(labelMap[prev] || '← Kembali');
+  } else {
+    setHref('/');
+    setLabel('← Kembali ke Halaman Utama');
+  }
+}, []);
 
   return (
     <Link
@@ -156,10 +158,8 @@ function LoginComponent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const redirectUrl = searchParams?.get('redirect') || '/dashboard';
-  const tabParam = searchParams?.get('tab');
 
-  // Inisialisasi dari URL param agar ?tab=register langsung buka form daftar
-  const [isSignUp, setIsSignUp] = useState(() => tabParam === 'register');
+  const [isSignUp, setIsSignUp] = useState(false);
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -170,22 +170,6 @@ function LoginComponent() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
-
-  // ─── Listen auth state — redirect segera saat session aktif ──────────────────
-  useEffect(() => {
-    // Cek kalau user sudah login sebelum render (misal kembali ke halaman login)
-    supabaseClient.auth.getSession().then(({ data: { session } }: { data: { session: import('@supabase/supabase-js').Session | null } }) => {
-      if (session) router.replace(redirectUrl);
-    });
-
-    // Listen perubahan session (termasuk setelah signInWithPassword berhasil)
-    const { data: { subscription } } = supabaseClient.auth.onAuthStateChange((event: import('@supabase/supabase-js').AuthChangeEvent, session: import('@supabase/supabase-js').Session | null) => {
-      if ((event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') && session) {
-        router.replace(redirectUrl);
-      }
-    });
-    return () => subscription.unsubscribe();
-  }, [redirectUrl, router]);
 
   // Password strength
   const getPasswordStrength = (pwd: string) => {
@@ -206,9 +190,6 @@ function LoginComponent() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    localStorage.removeItem('wc_guest_mode');
-    document.cookie = 'wc_guest_mode=; path=/; max-age=0';
 
     if (!email || !password) { setError('Email dan Password wajib diisi.'); return; }
     if (isSignUp) {
@@ -237,8 +218,8 @@ function LoginComponent() {
           setSuccess('Pendaftaran berhasil! Silakan cek email Anda untuk verifikasi akun.');
           setName(''); setEmail(''); setPassword(''); setConfirmPassword('');
         } else {
-          setSuccess('Registrasi sukses! Mengalihkan...');
-          setTimeout(() => router.push(redirectUrl), 1500);
+          setSuccess('Registrasi berhasil! Mengalihkan ke dashboard...');
+          setTimeout(() => router.replace(redirectUrl), 1000);
         }
       } else {
         const { error } = await supabaseClient.auth.signInWithPassword({ email, password });
@@ -247,9 +228,7 @@ function LoginComponent() {
         } else {
           setSuccess('Berhasil masuk! Mengalihkan...');
           if (rememberMe) localStorage.setItem('wc_remember_email', email);
-          // Redirect ditangani oleh onAuthStateChange listener di atas
-          // tapi fallback tetap ada
-          setTimeout(() => router.replace(redirectUrl), 1000);
+          setTimeout(() => router.push(redirectUrl), 1500);
         }
       }
     } catch (err) {
@@ -260,11 +239,8 @@ function LoginComponent() {
   };
 
   const handleGuestContinue = () => {
-    localStorage.removeItem('wc_cases');
     localStorage.setItem('wc_guest_mode', 'true');
-    // Set cookie agar middleware bisa deteksi guest mode (localStorage tidak dibaca server)
-    document.cookie = 'wc_guest_mode=true; path=/; max-age=86400; SameSite=Lax';
-    router.replace('/dashboard');
+    router.push('/dashboard');
   };
 
   return (
@@ -330,6 +306,9 @@ function LoginComponent() {
             </Link>
             <BackButton />
           </div>
+
+          {/* Desktop: back button above form (right side) */}
+
 
           {/* Form Header */}
           <div className="mb-8">

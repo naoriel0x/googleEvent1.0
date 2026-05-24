@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- Background -->
+  <rect width="512" height="512" rx="114" fill="#0f172a"/>
+
+  <!-- Scale beam -->
+  <rect x="90" y="238" width="332" height="11" rx="5.5" fill="#059669"/>
+
+  <!-- Center post -->
+  <rect x="250" y="168" width="12" height="140" rx="6" fill="#059669"/>
+
+  <!-- Center cap -->
+  <circle cx="256" cy="168" r="20" fill="#059669"/>
+  <circle cx="256" cy="168" r="10" fill="#34d399"/>
+
+  <!-- Left pan strings -->
+  <line x1="166" y1="246" x2="134" y2="330" stroke="#059669" stroke-width="7" stroke-linecap="round"/>
+  <line x1="166" y1="246" x2="198" y2="330" stroke="#059669" stroke-width="7" stroke-linecap="round"/>
+  <!-- Left pan -->
+  <rect x="102" y="324" width="120" height="22" rx="11" fill="#059669"/>
+
+  <!-- Right pan strings -->
+  <line x1="346" y1="246" x2="314" y2="330" stroke="#059669" stroke-width="7" stroke-linecap="round"/>
+  <line x1="346" y1="246" x2="378" y2="330" stroke="#059669" stroke-width="7" stroke-linecap="round"/>
+  <!-- Right pan -->
+  <rect x="290" y="324" width="120" height="22" rx="11" fill="#059669"/>
+
+  <!-- Chain links below post -->
+  <rect x="230" y="355" width="52" height="28" rx="14" fill="none" stroke="#059669" stroke-width="8" opacity="0.55"/>
+  <rect x="230" y="375" width="52" height="28" rx="14" fill="none" stroke="#059669" stroke-width="8" opacity="0.55"/>
+</svg>

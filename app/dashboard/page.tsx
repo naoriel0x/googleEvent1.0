@@ -612,6 +612,8 @@ export default function DashboardPage() {
 
       sessionStorage.removeItem("sessionId");
 
+      sessionStorage.removeItem('wc_prev_path');
+
       setUser(null);
 
       setIsGuest(false);
