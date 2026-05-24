@@ -19,3 +19,6 @@ steps:
       - '--region'
       - 'asia-southeast2' # Menggunakan server Jakarta biar latensinya rendah
       - '--allow-unauthenticated' # Akses publik biar bisa dibuka semua orang
+
+options:
+logging: CLOUD_LOGGING_ONLY
