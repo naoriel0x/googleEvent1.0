@@ -1,35 +1,47 @@
 'use client';
 
 import { useEffect } from 'react';
-import { useRouter, usePathname } from 'next/navigation'; // 1. Tambahkan usePathname
+import { useRouter, usePathname } from 'next/navigation';
 import { getSupabaseClient } from '@/lib/supabase';
 import { AuthChangeEvent } from '@supabase/supabase-js';
 
+// Fungsi bantuan untuk membaca cookie di sisi client
+const getCookie = (name: string) => {
+  if (typeof document === 'undefined') return null;
+  const value = `; ${document.cookie}`;
+  const parts = value.split(`; ${name}=`);
+  if (parts.length === 2) return parts.pop()?.split(';').shift();
+  return null;
+};
+
 export default function AuthListener() {
   const router = useRouter();
-  const pathname = usePathname(); // 2. Ambil rute url aktif saat ini
+  const pathname = usePathname();
 
   useEffect(() => {
     const supabase = getSupabaseClient();
     if (!supabase) return;
 
-    // CEK SESSION SAAT APP PERTAMA DIKUNJUNGI
+    // Daftar halaman publik yang BEBAS diakses siapa saja
+    const publicRoutes = ['/', '/login', '/share'];
+    const isPublicRoute = publicRoutes.some(r => pathname === r || pathname.startsWith(r + '/'));
+
+    // 1. CEK SESSION & GUEST MODE SAAT APP PERTAMA DIKUNJUNGI
     const checkSession = async () => {
       const { data, error } = await supabase.auth.getSession();
+      
+      // Cek apakah user sedang dalam mode Guest
+      const isGuest = getCookie('wc_guest_mode') === 'true';
 
-      // Jika refresh token invalid / session rusak
+      // Jika session error / token rusak total
       if (error || !data.session) {
-        // Panggil signOut bawaan Supabase untuk bersihkan cookie & token di storage
-        await supabase.auth.signOut();
-
-        // Catatan: localStorage.removeItem('supabase.auth.token') bersifat opsional 
-        // karena signOut() di atas otomatis membersihkan storage bawaan Supabase.
-
-        // Hanya lempar ke login jika user sedang tidak berada di rute publik
-        const publicRoutes = ['/', '/login', '/share'];
-        const isPublic = publicRoutes.some(r => pathname === r || pathname.startsWith(r + '/'));
+        // Hanya jalankan signOut jika memang bukan guest (mencegah loop)
+        if (!isGuest) {
+          await supabase.auth.signOut();
+        }
         
-        if (!isPublic) {
+        // 🔥 FIX: Jangan lempar ke login jika ini rute publik ATAU user adalah GUEST
+        if (!isPublicRoute && !isGuest) {
           router.replace('/login');
         }
       }
@@ -37,14 +49,22 @@ export default function AuthListener() {
 
     checkSession();
 
+    // 2. LISTENER LOGIN / LOGOUT REAL-TIME
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(
       async (event: AuthChangeEvent) => {
+        const isGuest = getCookie('wc_guest_mode') === 'true';
+        
+        // Jika statusnya SIGNED_OUT
         if (event === 'SIGNED_OUT') {
-          router.replace('/login');
+          // 🔥 FIX: Hanya lempar ke login kalau bukan rute publik DAN BUKAN akun guest
+          if (!isPublicRoute && !isGuest) {
+            router.replace('/login');
+          }
         }
 
+        // Jika user berhasil login resmi via Supabase
         if (event === 'SIGNED_IN') {
           router.refresh();
           
@@ -58,7 +78,7 @@ export default function AuthListener() {
     return () => {
       subscription.unsubscribe();
     };
-  }, [router, pathname]); // 3. Masukkan pathname ke dalam dependency array
+  }, [router, pathname]);
 
   return null;
 }
