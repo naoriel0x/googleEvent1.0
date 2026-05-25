@@ -1,10 +1,21 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import { Button } from '@/components/ui/Button';
-import { Scale, AlertTriangle, Clock, Info, CheckCircle, ChevronDown, ChevronUp, ArrowRight, FileText, Calendar } from 'lucide-react';
-import type { Case } from '@/types';
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/Button";
+import {
+  Scale,
+  AlertTriangle,
+  Clock,
+  Info,
+  CheckCircle,
+  ChevronDown,
+  ChevronUp,
+  ArrowRight,
+  FileText,
+  Calendar,
+} from "lucide-react";
+import type { Case } from "@/types";
 
 interface LegalAnalysis {
   kekuatan_kasus: number;
@@ -25,40 +36,44 @@ interface LegalAnalysis {
 
 // ─── State machine ────────────────────────────────────────────────────────────
 type PageState =
-  | { view: 'loading_cases' }
-  | { view: 'no_case' }
-  | { view: 'select_case'; cases: Case[] }
-  | { view: 'analyzing'; caseData: Case }
-  | { view: 'result'; caseData: Case; result: LegalAnalysis }
-  | { view: 'error'; caseData: Case; message: string };
+  | { view: "loading_cases" }
+  | { view: "no_case" }
+  | { view: "select_case"; cases: Case[] }
+  | { view: "analyzing"; caseData: Case }
+  | { view: "result"; caseData: Case; result: LegalAnalysis }
+  | { view: "error"; caseData: Case; message: string };
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 function formatDate(dateStr?: string) {
-  if (!dateStr) return '';
-  return new Date(dateStr).toLocaleDateString('id-ID', {
-    day: 'numeric',
-    month: 'short',
-    year: 'numeric',
+  if (!dateStr) return "";
+  return new Date(dateStr).toLocaleDateString("id-ID", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
   });
 }
 
 function truncate(text: string, max = 90) {
-  if (!text) return '';
-  return text.length <= max ? text : text.slice(0, max).trimEnd() + '…';
+  if (!text) return "";
+  return text.length <= max ? text : text.slice(0, max).trimEnd() + "…";
 }
 
 const VIOLATION_LABEL: Record<string, string> = {
-  penggusuran: 'Penggusuran',
-  sengketa_lahan: 'Sengketa Lahan',
-  pencemaran_lingkungan: 'Pencemaran Lingkungan',
-  pelanggaran_hak: 'Pelanggaran Hak',
-  lainnya: 'Lainnya',
+  penggusuran: "Penggusuran",
+  sengketa_lahan: "Sengketa Lahan",
+  pencemaran_lingkungan: "Pencemaran Lingkungan",
+  pelanggaran_hak: "Pelanggaran Hak",
+  lainnya: "Lainnya",
 };
 
 function caseTitle(c: Case, idx: number): string {
   const type = c.violation_type ? VIOLATION_LABEL[c.violation_type] : null;
   const date = c.incident_date
-    ? new Date(c.incident_date).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })
+    ? new Date(c.incident_date).toLocaleDateString("id-ID", {
+        day: "numeric",
+        month: "short",
+        year: "numeric",
+      })
     : null;
   if (type && date) return `${type} — ${date}`;
   if (type) return type;
@@ -97,9 +112,12 @@ function NoCasePage({ onStart }: { onStart: () => void }) {
       <BackgroundBlobs />
       <div className="max-w-2xl w-full flex flex-col items-center relative z-10">
         <Scale className="w-24 h-24 text-slate-400 mb-6" />
-        <h2 className="text-2xl font-bold text-slate-100 mb-2">Belum Ada Kasus untuk Dianalisis</h2>
+        <h2 className="text-2xl font-bold text-slate-100 mb-2">
+          Belum Ada Kasus untuk Dianalisis
+        </h2>
         <p className="text-slate-400 mb-8 max-w-md">
-          Mulai dokumentasi kasusmu terlebih dahulu agar AI kami dapat menganalisis dan memberikan pandangan hukum awal.
+          Mulai dokumentasi kasusmu terlebih dahulu agar AI kami dapat
+          menganalisis dan memberikan pandangan hukum awal.
         </p>
         <Button variant="primary" size="lg" onClick={onStart}>
           Mulai Dokumentasi
@@ -109,7 +127,13 @@ function NoCasePage({ onStart }: { onStart: () => void }) {
   );
 }
 
-function SelectCasePage({ cases, onSelect }: { cases: Case[]; onSelect: (c: Case) => void }) {
+function SelectCasePage({
+  cases,
+  onSelect,
+}: {
+  cases: Case[];
+  onSelect: (c: Case) => void;
+}) {
   return (
     <div className="flex-1 min-h-full bg-slate-950 text-slate-100 relative">
       <BackgroundBlobs />
@@ -120,8 +144,13 @@ function SelectCasePage({ cases, onSelect }: { cases: Case[]; onSelect: (c: Case
             <Scale className="w-4 h-4" />
             Legal Radar
           </div>
-          <h2 className="text-2xl font-bold text-slate-100">Pilih Kasus yang Ingin Dianalisis</h2>
-          <p className="text-slate-400 text-sm">Kamu punya {cases.length} kasus. Pilih salah satu untuk dianalisis AI.</p>
+          <h2 className="text-2xl font-bold text-slate-100">
+            Pilih Kasus yang Ingin Dianalisis
+          </h2>
+          <p className="text-slate-400 text-sm">
+            Kamu punya {cases.length} kasus. Pilih salah satu untuk dianalisis
+            AI.
+          </p>
         </div>
 
         {/* Case list */}
@@ -150,7 +179,7 @@ function SelectCasePage({ cases, onSelect }: { cases: Case[]; onSelect: (c: Case
                   )}
                 </div>
                 <p className="text-xs text-slate-400 leading-relaxed line-clamp-2">
-                  {truncate(c.description ?? '', 120)}
+                  {truncate(c.description ?? "", 120)}
                 </p>
                 {(c.created_at || c.updated_at) && (
                   <div className="flex items-center gap-1.5 mt-2 text-[11px] text-slate-500">
@@ -177,11 +206,16 @@ function AnalyzingPage() {
       <div className="max-w-2xl mx-auto px-4 py-8 relative z-10">
         <div className="flex flex-col items-center justify-center py-12 space-y-6">
           <div className="w-12 h-12 border-4 border-emerald-600/30 border-t-emerald-400 rounded-full animate-spin" />
-          <p className="text-emerald-300 font-semibold animate-pulse">AI sedang menganalisis kasusmu…</p>
+          <p className="text-emerald-300 font-semibold animate-pulse">
+            AI sedang menganalisis kasusmu…
+          </p>
         </div>
         <div className="space-y-4">
           {[1, 2, 3, 4].map((i) => (
-            <div key={i} className="w-full h-32 bg-slate-800/50 animate-pulse rounded-2xl" />
+            <div
+              key={i}
+              className="w-full h-32 bg-slate-800/50 animate-pulse rounded-2xl"
+            />
           ))}
         </div>
       </div>
@@ -189,13 +223,21 @@ function AnalyzingPage() {
   );
 }
 
-function ErrorPage({ message, onRetry }: { message: string; onRetry: () => void }) {
+function ErrorPage({
+  message,
+  onRetry,
+}: {
+  message: string;
+  onRetry: () => void;
+}) {
   return (
     <div className="flex-1 min-h-full bg-slate-950 text-slate-100 flex flex-col items-center justify-center px-4 py-12 text-center relative">
       <BackgroundBlobs />
       <div className="max-w-2xl w-full flex flex-col items-center relative z-10">
         <AlertTriangle className="w-16 h-16 text-red-400 mb-4" />
-        <h2 className="text-xl font-bold text-slate-100 mb-2">Analisis Gagal</h2>
+        <h2 className="text-xl font-bold text-slate-100 mb-2">
+          Analisis Gagal
+        </h2>
         <p className="text-slate-400 mb-6">{message}</p>
         <Button variant="primary" onClick={onRetry}>
           Coba Lagi
@@ -219,22 +261,25 @@ function ResultPage({
   const [expandedPasal, setExpandedPasal] = useState<number | null>(null);
 
   const scoreLabel =
-    result.kekuatan_kasus <= 2 ? 'Lemah' :
-    result.kekuatan_kasus === 3 ? 'Cukup' :
-    result.kekuatan_kasus === 4 ? 'Kuat' : 'Sangat Kuat';
+    result.kekuatan_kasus <= 2
+      ? "Lemah"
+      : result.kekuatan_kasus === 3
+        ? "Cukup"
+        : result.kekuatan_kasus === 4
+          ? "Kuat"
+          : "Sangat Kuat";
 
   const scoreGradient =
     result.kekuatan_kasus <= 2
-      ? 'bg-linear-to-r from-red-50 to-red-100 border-red-200'
+      ? "bg-red-950/40 border-red-800/60"
       : result.kekuatan_kasus === 3
-      ? 'bg-linear-to-r from-amber-50 to-amber-100 border-amber-200'
-      : 'bg-linear-to-r from-emerald-50 to-emerald-100 border-emerald-200';
+        ? "bg-amber-950/40 border-amber-800/60"
+        : "bg-emerald-950/40 border-emerald-800/60";
 
   return (
     <div className="flex-1 min-h-full bg-slate-950 text-slate-100 relative">
       <BackgroundBlobs />
       <div className="max-w-2xl mx-auto px-4 py-6 pb-8 space-y-6 relative z-10">
-
         {/* Back button — only shown when user came from the selection screen */}
         {hasMultiple && (
           <button
@@ -248,7 +293,9 @@ function ResultPage({
 
         {/* Card 1: Kekuatan Kasus */}
         <div className={`p-6 rounded-2xl border shadow-sm ${scoreGradient}`}>
-          <h3 className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-2">Kekuatan Kasus</h3>
+          <h3 className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-2">
+            Kekuatan Kasus
+          </h3>
           <div className="flex items-center gap-4">
             <div className="flex">
               {[1, 2, 3, 4, 5].map((star) => (
@@ -257,11 +304,11 @@ function ResultPage({
                   className={`text-3xl ${
                     star <= result.kekuatan_kasus
                       ? result.kekuatan_kasus <= 2
-                        ? 'text-red-500'
+                        ? "text-red-500"
                         : result.kekuatan_kasus === 3
-                        ? 'text-amber-500'
-                        : 'text-emerald-500'
-                      : 'text-slate-300'
+                          ? "text-amber-500"
+                          : "text-emerald-500"
+                      : "text-slate-300"
                   }`}
                 >
                   ★
@@ -269,10 +316,50 @@ function ResultPage({
               ))}
             </div>
             <div className="flex flex-col">
-              <span className="text-2xl font-extrabold text-slate-100">{scoreLabel}</span>
-              <span className="text-xs text-slate-400 font-medium">{result.pasal_dilanggar.length} pasal teridentifikasi</span>
+              <span
+                className={`text-2xl font-extrabold ${
+                  result.kekuatan_kasus <= 2
+                    ? "text-red-300"
+                    : result.kekuatan_kasus === 3
+                      ? "text-amber-300"
+                      : "text-emerald-300"
+                }`}
+              >
+                {scoreLabel}
+              </span>
+              <span className="text-xs text-slate-400 font-medium">
+                {result.pasal_dilanggar.length} pasal teridentifikasi
+              </span>
             </div>
           </div>
+          {result.kekuatan_kasus <= 2 && (
+            <div className="mt-4 pt-4 border-t border-red-800/40">
+              <p className="text-xs font-bold text-red-300 mb-2">
+                Mengapa kasus ini dinilai lemah?
+              </p>
+              <ul className="space-y-1.5">
+                {[
+                  !result.pasal_dilanggar.length &&
+                    "Tidak ada pasal hukum yang teridentifikasi",
+                  result.pasal_dilanggar.length < 2 &&
+                    "Hanya sedikit pasal yang relevan ditemukan",
+                  "Dokumentasi perlu diperkuat dengan lebih banyak bukti",
+                  "Kronologi kejadian perlu lebih rinci dan terstruktur",
+                  "Saksi-saksi belum tercatat dengan lengkap",
+                ]
+                  .filter(Boolean)
+                  .map((reason, i) => (
+                    <li
+                      key={i}
+                      className="flex items-start gap-2 text-xs text-red-200/80"
+                    >
+                      <span className="text-red-400 mt-0.5 shrink-0">•</span>
+                      {reason}
+                    </li>
+                  ))}
+              </ul>
+            </div>
+          )}
         </div>
 
         {/* Card 2: Pasal */}
@@ -286,24 +373,31 @@ function ResultPage({
           <div className="divide-y divide-slate-800/80">
             {result.pasal_dilanggar.length === 0 ? (
               <div className="p-6 text-center text-slate-400 text-sm">
-                Tidak ada pasal spesifik yang teridentifikasi dari informasi yang diberikan.
+                Tidak ada pasal spesifik yang teridentifikasi dari informasi
+                yang diberikan.
               </div>
             ) : (
               result.pasal_dilanggar.map((pasal, idx) => (
                 <div key={idx} className="flex flex-col">
                   <button
                     className="p-4 flex items-center justify-between hover:bg-slate-800/50 transition-colors w-full text-left"
-                    onClick={() => setExpandedPasal(expandedPasal === idx ? null : idx)}
+                    onClick={() =>
+                      setExpandedPasal(expandedPasal === idx ? null : idx)
+                    }
                   >
                     <div className="flex items-center gap-3">
                       <span className="bg-red-500/30 text-red-300 text-xs font-bold px-2 py-1 rounded-md shrink-0">
                         {pasal.pasal}
                       </span>
-                      <span className="text-sm font-semibold text-slate-100">{pasal.nama}</span>
+                      <span className="text-sm font-semibold text-slate-100">
+                        {pasal.nama}
+                      </span>
                     </div>
-                    {expandedPasal === idx
-                      ? <ChevronUp className="w-4 h-4 text-slate-500" />
-                      : <ChevronDown className="w-4 h-4 text-slate-500" />}
+                    {expandedPasal === idx ? (
+                      <ChevronUp className="w-4 h-4 text-slate-500" />
+                    ) : (
+                      <ChevronDown className="w-4 h-4 text-slate-500" />
+                    )}
                   </button>
                   {expandedPasal === idx && (
                     <div className="px-4 pb-4 pt-1 bg-slate-800/30 text-sm text-slate-300 leading-relaxed border-t border-slate-800/50">
@@ -331,7 +425,9 @@ function ResultPage({
                   {rek.urutan}
                 </div>
                 <div className="flex-1 pt-1">
-                  <h4 className="text-sm font-bold text-slate-900 mb-1">{rek.langkah}</h4>
+                  <h4 className="text-sm font-bold text-slate-900 mb-1">
+                    {rek.langkah}
+                  </h4>
                   <p className="text-sm text-slate-700">{rek.detail}</p>
                 </div>
               </div>
@@ -365,7 +461,9 @@ function ResultPage({
             <Clock className="w-5 h-5 text-slate-700" />
           </div>
           <div>
-            <h3 className="text-sm font-bold text-slate-900 mb-1">Estimasi Timeline</h3>
+            <h3 className="text-sm font-bold text-slate-900 mb-1">
+              Estimasi Timeline
+            </h3>
             <p className="text-sm text-slate-700">{result.estimasi_timeline}</p>
           </div>
         </div>
@@ -377,7 +475,6 @@ function ResultPage({
             {result.disclaimer}
           </p>
         </div>
-
       </div>
     </div>
   );
@@ -387,27 +484,28 @@ function ResultPage({
 
 export default function LegalRadarPage() {
   const router = useRouter();
-  const [state, setState] = useState<PageState>({ view: 'loading_cases' });
+  const [state, setState] = useState<PageState>({ view: "loading_cases" });
   // track if user had multiple cases (so result page can show "back" btn)
   const [hadMultiple, setHadMultiple] = useState(false);
 
   // ── Fetch analysis ──────────────────────────────────────────────────────────
   const runAnalysis = async (caseData: Case) => {
-    setState({ view: 'analyzing', caseData });
+    setState({ view: "analyzing", caseData });
     try {
-      const response = await fetch('/api/legal-radar', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const response = await fetch("/api/legal-radar", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ caseData }),
       });
       const resultData = await response.json();
-      if (!response.ok) throw new Error(resultData.error || 'Gagal menganalisis kasus');
-      setState({ view: 'result', caseData, result: resultData });
+      if (!response.ok)
+        throw new Error(resultData.error || "Gagal menganalisis kasus");
+      setState({ view: "result", caseData, result: resultData });
     } catch (err: any) {
       setState({
-        view: 'error',
+        view: "error",
         caseData,
-        message: err.message || 'Terjadi kesalahan saat menghubungi server AI',
+        message: err.message || "Terjadi kesalahan saat menghubungi server AI",
       });
     }
   };
@@ -416,14 +514,17 @@ export default function LegalRadarPage() {
   useEffect(() => {
     const loadCases = async () => {
       try {
-        const { supabaseClient } = await import('@/lib/supabase');
-        const { data: { session } } = await supabaseClient.auth.getSession();
+        const { getSupabaseClient } = await import("@/lib/supabase");
+        const supabaseClient = getSupabaseClient();
+        const {
+          data: { session },
+        } = await supabaseClient.auth.getSession();
 
         let allCases: Case[] = [];
 
         // 1. Logged-in user: fetch all cases from API
         if (session?.access_token) {
-          const res = await fetch('/api/cases', {
+          const res = await fetch("/api/cases", {
             headers: { Authorization: `Bearer ${session.access_token}` },
           });
           if (res.ok) {
@@ -434,7 +535,7 @@ export default function LegalRadarPage() {
                 .sort(
                   (a: Case, b: Case) =>
                     new Date(b.created_at || b.updated_at).getTime() -
-                    new Date(a.created_at || a.updated_at).getTime()
+                    new Date(a.created_at || a.updated_at).getTime(),
                 );
             }
           }
@@ -442,11 +543,14 @@ export default function LegalRadarPage() {
 
         // 2. Fallback: session_id (guest / just finished interview)
         if (allCases.length === 0) {
-          const sessionId = sessionStorage.getItem('sessionId');
+          const sessionId = sessionStorage.getItem("sessionId");
           if (sessionId) {
             const headers: HeadersInit = {};
-            if (session?.access_token) headers['Authorization'] = `Bearer ${session.access_token}`;
-            const res = await fetch(`/api/cases?session_id=${sessionId}`, { headers });
+            if (session?.access_token)
+              headers["Authorization"] = `Bearer ${session.access_token}`;
+            const res = await fetch(`/api/cases?session_id=${sessionId}`, {
+              headers,
+            });
             if (res.ok) {
               const data = await res.json();
               if (data?.description?.trim()) allCases = [data];
@@ -456,7 +560,7 @@ export default function LegalRadarPage() {
 
         // 3. Last resort: localStorage (legacy)
         if (allCases.length === 0) {
-          const storedData = localStorage.getItem('wc_case_data');
+          const storedData = localStorage.getItem("wc_case_data");
           if (storedData) {
             const parsed = JSON.parse(storedData);
             if (parsed?.description?.trim()) allCases = [parsed];
@@ -465,7 +569,7 @@ export default function LegalRadarPage() {
 
         // ── Decide which state to enter ───────────────────────────────────────
         if (allCases.length === 0) {
-          setState({ view: 'no_case' });
+          setState({ view: "no_case" });
         } else if (allCases.length === 1) {
           // Single case → auto-analyze
           setHadMultiple(false);
@@ -473,11 +577,11 @@ export default function LegalRadarPage() {
         } else {
           // Multiple cases → let user pick
           setHadMultiple(true);
-          setState({ view: 'select_case', cases: allCases });
+          setState({ view: "select_case", cases: allCases });
         }
       } catch (e) {
-        console.error('Failed to load cases for legal radar', e);
-        setState({ view: 'no_case' });
+        console.error("Failed to load cases for legal radar", e);
+        setState({ view: "no_case" });
       }
     };
 
@@ -487,24 +591,21 @@ export default function LegalRadarPage() {
 
   // ── Render ──────────────────────────────────────────────────────────────────
   switch (state.view) {
-    case 'loading_cases':
+    case "loading_cases":
       return <LoadingCases />;
 
-    case 'no_case':
-      return <NoCasePage onStart={() => router.push('/interview')} />;
+    case "no_case":
+      return <NoCasePage onStart={() => router.push("/interview")} />;
 
-    case 'select_case':
+    case "select_case":
       return (
-        <SelectCasePage
-          cases={state.cases}
-          onSelect={(c) => runAnalysis(c)}
-        />
+        <SelectCasePage cases={state.cases} onSelect={(c) => runAnalysis(c)} />
       );
 
-    case 'analyzing':
+    case "analyzing":
       return <AnalyzingPage />;
 
-    case 'error':
+    case "error":
       return (
         <ErrorPage
           message={state.message}
@@ -512,7 +613,7 @@ export default function LegalRadarPage() {
         />
       );
 
-    case 'result':
+    case "result":
       return (
         <ResultPage
           result={state.result}

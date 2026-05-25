@@ -1,8 +1,14 @@
-'use client';
+"use client";
 
-import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
-import { Session, User } from '@supabase/supabase-js';
-import { supabaseClient } from './supabase';
+import React, {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  ReactNode,
+} from "react";
+import { Session, User } from "@supabase/supabase-js";
+import { getSupabaseClient } from "./supabase";
 
 interface AuthContextType {
   user: User | null;
@@ -14,6 +20,7 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
+  const supabaseClient = getSupabaseClient();
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
@@ -22,11 +29,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // Get initial session
     const getInitialSession = async () => {
       try {
-        const { data: { session: initialSession } } = await supabaseClient.auth.getSession();
+        const {
+          data: { session: initialSession },
+        } = await supabaseClient.auth.getSession();
         setSession(initialSession);
         setUser(initialSession?.user ?? null);
       } catch (error) {
-        console.error('Error getting session:', error);
+        console.error("Error getting session:", error);
       } finally {
         setLoading(false);
       }
@@ -35,16 +44,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     getInitialSession();
 
     // Listen for auth changes
-    const { data: { subscription } } = supabaseClient.auth.onAuthStateChange(
-      (event, newSession) => {
+    const {
+      data: { subscription },
+    } = supabaseClient.auth.onAuthStateChange(
+      (
+        event: import("@supabase/supabase-js").AuthChangeEvent,
+        newSession: import("@supabase/supabase-js").Session | null,
+      ) => {
         setSession(newSession);
         setUser(newSession?.user ?? null);
-        
-        // Store redirect path before sign out
-        if (event === 'SIGNED_OUT') {
-          sessionStorage.removeItem('wc_prev_path');
+
+        if (event === "SIGNED_OUT") {
+          sessionStorage.removeItem("wc_prev_path");
         }
-      }
+      },
     );
 
     return () => {
@@ -58,7 +71,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setSession(null);
       setUser(null);
     } catch (error) {
-      console.error('Error signing out:', error);
+      console.error("Error signing out:", error);
       throw error;
     }
   };
@@ -77,7 +90,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 export function useAuth() {
   const context = useContext(AuthContext);
   if (context === undefined) {
-    throw new Error('useAuth harus digunakan dalam <AuthProvider>');
+    throw new Error("useAuth harus digunakan dalam <AuthProvider>");
   }
   return context;
 }

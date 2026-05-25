@@ -46,6 +46,13 @@ export function EvidenceUpload({ onUpload, onClose }: EvidenceUploadProps) {
     return hashArray.map((b) => b.toString(16).padStart(2, '0')).join('');
   };
 
+  const toBase64 = (file: File): Promise<string> =>
+    new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.onload = (e) => resolve(e.target?.result as string);
+      reader.readAsDataURL(file);
+    });
+
   const handleUpload = async () => {
     if (!file) return;
 
@@ -57,7 +64,7 @@ export function EvidenceUpload({ onUpload, onClose }: EvidenceUploadProps) {
       if (type === 'photo' && preview) {
         url = preview;
       } else {
-        url = URL.createObjectURL(file);
+        url = await toBase64(file);
       }
 
       const evidence: Evidence = {

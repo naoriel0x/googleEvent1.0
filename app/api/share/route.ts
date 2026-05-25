@@ -18,7 +18,7 @@ export async function POST(req: Request) {
       .from('cases')
       .select('id, status')
       .eq('id', case_id)
-      .single();
+      .single() as any;
 
     if (caseError || !caseData) {
       return NextResponse.json({ error: 'Case not found' }, { status: 404 });
@@ -26,10 +26,10 @@ export async function POST(req: Request) {
 
     // Generate token
     const token = crypto.randomUUID() + '-' + Date.now().toString(36);
-    const expired_at = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
+    const expired_at = new Date(Date.now() + 1 * 24 * 60 * 60 * 1000).toISOString();
 
     // Update case
-    const { error: updateError } = await supabaseAdmin
+    const { error: updateError } = await (supabaseAdmin as any)
       .from('cases')
       .update({
         share_token: token,
@@ -69,7 +69,7 @@ export async function GET(req: Request) {
       .select('*')
       .eq('share_token', token)
       .gt('share_expired_at', new Date().toISOString())
-      .single();
+      .single() as any;
 
     if (error || !data) {
       return NextResponse.json({ error: 'Token tidak valid atau sudah expired' }, { status: 404 });

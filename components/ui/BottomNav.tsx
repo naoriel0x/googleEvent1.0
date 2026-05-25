@@ -16,13 +16,13 @@ export function BottomNav() {
   ];
 
   return (
-    // Outer wrapper: fixed, full width, transparent — only for positioning + safe area
+    // Outer wrapper — raised higher from bottom, with horizontal padding so pill doesn't touch screen edges
     <div
-      className="fixed bottom-0 left-0 right-0 z-50 flex justify-center pb-3 pointer-events-none"
-      style={{ paddingBottom: 'max(0.75rem, env(safe-area-inset-bottom))' }}
+      className="fixed bottom-0 left-0 right-0 z-50 flex justify-center px-4 pointer-events-none"
+      style={{ paddingBottom: 'max(1.25rem, calc(env(safe-area-inset-bottom) + 0.75rem))' }}
     >
       {/* The floating Dynamic Island pill */}
-      <nav className="pointer-events-auto flex items-center gap-1 px-3 py-2 rounded-2xl border border-slate-700/50 bg-slate-900/80 backdrop-blur-2xl shadow-2xl shadow-black/50 transition-all duration-500">
+      <nav className="pointer-events-auto flex items-center gap-1 px-3 py-2 rounded-2xl border border-slate-700/50 bg-slate-900/85 backdrop-blur-2xl shadow-2xl shadow-black/50 transition-all duration-500 w-full max-w-sm">
         {navItems.map((item) => {
           const Icon = item.icon;
           const isActive =
@@ -36,7 +36,7 @@ export function BottomNav() {
               href={item.href}
               className={`
                 relative flex flex-col items-center justify-center
-                px-4 py-2 rounded-xl
+                flex-1 py-2 rounded-xl
                 transition-all duration-200 active:scale-90
                 group
                 ${isActive
