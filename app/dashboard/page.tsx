@@ -3,8 +3,8 @@
 import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { supabaseClient } from "@/lib/supabase";
-import { useAuth } from '@/lib/auth-context';
+import { getSupabaseClient } from "@/lib/supabase";
+import { useAuth } from "@/lib/auth-context";
 import { Button } from "@/components/ui/Button";
 import { Spinner } from "@/components/ui/Spinner";
 import type { Case } from "@/types";
@@ -240,9 +240,9 @@ function DashboardFooter() {
             "max(5.5rem, calc(env(safe-area-inset-bottom) + 4.5rem))",
         }}
       >
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-10">
+        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-5 gap-6 sm:gap-10">
           {/* Brand col */}
-          <div className="lg:col-span-1 space-y-5">
+          <div className="col-span-2 lg:col-span-1 space-y-4">
             <Link href="/" className="flex items-center gap-2.5">
               <div className="p-1.5 bg-emerald-500/10 border border-emerald-500/20 rounded-lg text-emerald-400">
                 <Shield className="w-4 h-4" />
@@ -409,6 +409,7 @@ function DashboardFooter() {
 
 // ─── Main Dashboard ───────────────────────────────────────────────────────────
 export default function DashboardPage() {
+  const supabaseClient = getSupabaseClient();
   const router = useRouter();
   const [user, setUser] = useState<import("@supabase/supabase-js").User | null>(
     null,
@@ -481,7 +482,7 @@ export default function DashboardPage() {
         // =====================================================
         const {
           data: { session },
-          error: sessionError // Tangkap error session di sini
+          error: sessionError, // Tangkap error session di sini
         } = await supabaseClient.auth.getSession();
 
         // Kalau ada error (misal: token basi / Invalid Refresh Token)
@@ -495,7 +496,7 @@ export default function DashboardPage() {
           if (!mounted) return;
 
           localStorage.removeItem("wc_guest_mode");
-          document.cookie = 'wc_guest_mode=; path=/; max-age=0';
+          document.cookie = "wc_guest_mode=; path=/; max-age=0";
           sessionStorage.removeItem("sessionId");
 
           setUser(session.user);
@@ -612,7 +613,7 @@ export default function DashboardPage() {
 
       sessionStorage.removeItem("sessionId");
 
-      sessionStorage.removeItem('wc_prev_path');
+      sessionStorage.removeItem("wc_prev_path");
 
       setUser(null);
 
@@ -746,51 +747,53 @@ export default function DashboardPage() {
         )}
 
         {/* Analytics Grid */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
           {[
             {
               label: "Total Kasus",
               value: stats.total,
               color: "slate",
-              icon: <FileText className="w-5 h-5" />,
+              icon: <FileText className="w-4 h-4 sm:w-5 sm:h-5" />,
               textColor: "text-white",
             },
             {
               label: "Draf Aktif",
               value: stats.drafts,
               color: "amber",
-              icon: <Clock className="w-5 h-5" />,
+              icon: <Clock className="w-4 h-4 sm:w-5 sm:h-5" />,
               textColor: "text-amber-400",
             },
             {
               label: "Simpan Permanen",
               value: stats.completed,
               color: "emerald",
-              icon: <CheckCircle className="w-5 h-5" />,
+              icon: <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5" />,
               textColor: "text-emerald-400",
             },
             {
               label: "Rata Kelengkapan",
               value: `${stats.avgCompleteness}%`,
               color: "teal",
-              icon: <TrendingUp className="w-5 h-5" />,
+              icon: <TrendingUp className="w-4 h-4 sm:w-5 sm:h-5" />,
               textColor: "text-teal-400",
             },
           ].map((stat, i) => (
             <div
               key={i}
-              className="bg-slate-900/40 border border-slate-800/80 p-5 rounded-2xl shadow-sm flex items-center gap-4 hover:border-slate-700 transition-all"
+              className="bg-slate-900/40 border border-slate-800/80 p-3 sm:p-5 rounded-2xl shadow-sm flex flex-col gap-3 hover:border-slate-700 transition-all"
             >
               <div
-                className={`p-3.5 bg-${stat.color}-500/10 text-${stat.color}-400 rounded-xl border border-${stat.color}-500/20 shadow-inner flex-shrink-0`}
+                className={`p-2.5 bg-${stat.color}-500/10 text-${stat.color}-400 rounded-xl border border-${stat.color}-500/20 shadow-inner w-fit`}
               >
                 {stat.icon}
               </div>
               <div>
-                <p className="text-[10px] font-extrabold text-slate-500 uppercase tracking-wider">
+                <p className="text-[9px] sm:text-[10px] font-extrabold text-slate-500 uppercase tracking-wider leading-tight">
                   {stat.label}
                 </p>
-                <p className={`text-2xl font-black mt-0.5 ${stat.textColor}`}>
+                <p
+                  className={`text-xl sm:text-2xl font-black mt-0.5 ${stat.textColor}`}
+                >
                   {stat.value}
                 </p>
               </div>
@@ -841,15 +844,22 @@ export default function DashboardPage() {
           </div>
 
           {filteredCases.length === 0 ? (
-            <div className="text-center py-16 bg-slate-950/40 rounded-2xl border border-slate-800/50">
-              <FileText className="w-12 h-12 text-slate-700 mx-auto mb-4" />
-              <p className="text-sm text-slate-400 font-bold">
-                Tidak ada berkas kasus ditemukan
+            <div className="text-center py-12 px-6 bg-slate-950/40 rounded-2xl border border-slate-800/50">
+              <div className="w-16 h-16 rounded-2xl bg-slate-800/60 border border-slate-700/50 flex items-center justify-center mx-auto mb-4">
+                <FileText className="w-8 h-8 text-slate-600" />
+              </div>
+              <p className="text-sm font-bold text-slate-300 mb-1">
+                Belum ada berkas kasus
               </p>
-              <p className="text-xs text-slate-600 mt-1 max-w-xs mx-auto">
-                Silakan mulai sesi wawancara asisten baru untuk mencatat berkas
-                kasus Anda.
+              <p className="text-xs text-slate-500 max-w-[220px] mx-auto leading-relaxed">
+                Mulai sesi wawancara baru untuk mencatat kasus Anda.
               </p>
+              <Link
+                href="/interview"
+                className="mt-5 inline-flex items-center gap-2 px-4 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-xl transition-all"
+              >
+                <Plus className="w-3.5 h-3.5" /> Mulai Kasus Baru
+              </Link>
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

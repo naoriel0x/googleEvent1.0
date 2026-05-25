@@ -1,27 +1,12 @@
 import { GoogleAuth } from 'google-auth-library';
 
 interface GeminiRequest {
-  contents: Array<{
-    role: string;
-    parts: Array<{
-      text: string;
-    }>;
-  }>;
-  systemInstruction?: {
-    parts: Array<{
-      text: string;
-    }>;
-  };
+  contents: Array<{ role: string; parts: Array<{ text: string }> }>;
+  systemInstruction?: { parts: Array<{ text: string }> };
 }
 
 interface GeminiResponse {
-  candidates: Array<{
-    content: {
-      parts: Array<{
-        text: string;
-      }>;
-    };
-  }>;
+  candidates: Array<{ content: { parts: Array<{ text: string }> } }>;
 }
 
 let auth: GoogleAuth | null = null;
@@ -29,7 +14,6 @@ let auth: GoogleAuth | null = null;
 async function getAuth(): Promise<GoogleAuth> {
   if (auth) return auth;
 
-  // Coba dari base64 env var dulu (untuk Cloud Run)
   const base64Credentials = process.env.GOOGLE_CREDENTIALS_BASE64;
   if (base64Credentials) {
     const credentials = JSON.parse(
@@ -42,7 +26,6 @@ async function getAuth(): Promise<GoogleAuth> {
     return auth;
   }
 
-  // Fallback: baca dari file (untuk local development)
   const { readFileSync } = await import('fs');
   const { join } = await import('path');
   const credentialsPath = join(
@@ -54,11 +37,18 @@ async function getAuth(): Promise<GoogleAuth> {
     credentials,
     scopes: ['https://www.googleapis.com/auth/cloud-platform'],
   });
-
   return auth;
 }
 
+// ─── Token cache (baru) ───────────────────────────────────────────────────────
+let cachedToken: { token: string; expiresAt: number } | null = null;
+
 async function getAccessToken(): Promise<string> {
+  const now = Date.now();
+  if (cachedToken && cachedToken.expiresAt > now + 60_000) {
+    return cachedToken.token;
+  }
+
   const authClient = await getAuth();
   const client = await authClient.getClient();
   const accessToken = await client.getAccessToken();
@@ -67,7 +57,12 @@ async function getAccessToken(): Promise<string> {
     throw new Error('Failed to get access token from Google Cloud');
   }
 
-  return accessToken.token;
+  cachedToken = {
+    token: accessToken.token,
+    expiresAt: now + 55 * 60 * 1000,
+  };
+
+  return cachedToken.token;
 }
 
 export async function generateContent(
@@ -90,18 +85,11 @@ export async function generateContent(
       const endpoint = `https://aiplatform.googleapis.com/v1/projects/${projectId}/locations/global/publishers/google/models/${model}:generateContent`;
 
       const requestBody: GeminiRequest = {
-        contents: [
-          {
-            role: 'user',
-            parts: [{ text: prompt }],
-          },
-        ],
+        contents: [{ role: 'user', parts: [{ text: prompt }] }],
       };
 
       if (systemPrompt) {
-        requestBody.systemInstruction = {
-          parts: [{ text: systemPrompt }],
-        };
+        requestBody.systemInstruction = { parts: [{ text: systemPrompt }] };
       }
 
       const response = await fetch(endpoint, {
@@ -127,9 +115,7 @@ export async function generateContent(
       return data.candidates[0].content.parts[0].text;
     } catch (error) {
       lastError = error instanceof Error ? error : new Error(String(error));
-
       if (attempt < maxRetries) {
-        // Exponential backoff
         await new Promise((resolve) =>
           setTimeout(resolve, 1000 * Math.pow(2, attempt))
         );
@@ -138,6 +124,6 @@ export async function generateContent(
   }
 
   throw new Error(
-    `Failed to generate content after ${maxRetries + 1} attempts: ${lastError?.message}`
+    `Failed after ${maxRetries + 1} attempts: ${lastError?.message}`
   );
 }

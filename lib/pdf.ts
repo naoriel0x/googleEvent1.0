@@ -332,11 +332,12 @@ export async function generateCasePDF(caseData: Case): Promise<Buffer> {
 
       // Photo preview (only for photos, with border)
       if (isPhoto) {
+        const imgFormat = ev.url.includes('image/png') ? 'PNG' : 'JPEG';
         const imgY = y + 23;
         const imgW = 55;
         const imgH = photoH - 4;
         try {
-          doc.addImage(ev.url, 'JPEG', ML + 3, imgY, imgW, imgH);
+          doc.addImage(ev.url, imgFormat, ML + 3, imgY, imgW, imgH);
           // Border around image
           doc.setDrawColor(...C.border);
           doc.setLineWidth(0.3);

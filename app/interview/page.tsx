@@ -9,7 +9,7 @@ import { ProgressTracker } from '@/components/interview/ProgressTracker';
 import { EvidenceUpload } from '@/components/interview/EvidenceUpload';
 import { CaseFormModal } from '@/components/interview/CaseFormModal';
 import type { Case, Message, Evidence } from '@/types';
-import { supabaseClient } from '@/lib/supabase';
+import { getSupabaseClient } from '@/lib/supabase';
 import { 
   Shield, 
   FileText, 
@@ -24,6 +24,7 @@ import {
 } from 'lucide-react';
 
 export default function InterviewPage() {
+  const supabaseClient = getSupabaseClient();
   const [sessionId, setSessionId] = useState<string>('');
   const [user, setUser] = useState<import('@supabase/supabase-js').User | null>(null);
 

@@ -9,6 +9,11 @@ export async function GET(request: Request) {
   const code = requestUrl.searchParams.get('code')
   const redirect = requestUrl.searchParams.get('redirect') || '/dashboard'
 
+  console.log('CALLBACK HIT')
+  console.log('REQUEST URL:', request.url)
+  console.log('APP URL:', process.env.NEXT_PUBLIC_APP_URL)
+  console.log('REDIRECT TO:', redirect)
+
   if (code) {
     const cookieStore = await cookies()
 

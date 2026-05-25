@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/Button';
 import { Spinner } from '@/components/ui/Spinner';
-import { supabaseClient } from '@/lib/supabase';
+import { getSupabaseClient } from '@/lib/supabase';
 import type { Case } from '@/types';
 import {
   ClipboardList,
@@ -43,6 +43,7 @@ function formatTimestamp(dateStr: string): string {
 }
 
 export default function ResultIndexPage() {
+  const supabaseClient = getSupabaseClient();
   const router = useRouter();
   const [cases, setCases] = useState<Case[]>([]);
   const [loading, setLoading] = useState(true);
