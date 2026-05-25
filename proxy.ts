@@ -61,9 +61,29 @@ export default async function proxy(request: NextRequest) {
     }
   );
 
-  const { data: { session } } = await supabase.auth.getSession();
+  // Ambil session DAN error dari Supabase
+  const { data: { session }, error } = await supabase.auth.getSession();
   const guestCookie = request.cookies.get('wc_guest_mode');
   const isGuest = guestCookie?.value === 'true';
+
+  // FIX: Jika ada error auth (seperti Invalid Refresh Token), langsung bersihkan cookie-nya
+  if (error) {
+    console.error('Middleware Auth Error, otomatis membersihkan sesi:', error.message);
+    
+    const url = request.nextUrl.clone();
+    url.pathname = '/login';
+    // Kita hilangkan parameter ?redirect agar tidak loop, karena sesinya memang bermasalah
+    const errorResponse = NextResponse.redirect(url);
+
+    // Hapus semua cookie bawaan Supabase yang nyangkut (biasanya berawalan 'sb-')
+    request.cookies.getAll().forEach((cookie) => {
+      if (cookie.name.startsWith('sb-')) {
+        errorResponse.cookies.delete(cookie.name);
+      }
+    });
+
+    return errorResponse;
+  }
 
   if (!session && !isGuest) {
     const url = request.nextUrl.clone();
