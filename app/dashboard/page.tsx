@@ -18,6 +18,7 @@ import {
   Search,
   LogOut,
   Clock,
+  AlertTriangle,
   CheckCircle,
   ArrowRight,
   TrendingUp,
@@ -84,6 +85,17 @@ function DashboardNavbar({
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  // Fungsi untuk handle smooth scroll ke paling atas
+  const handleLogoClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    if (window.location.pathname === "/dashboard") {
+      e.preventDefault(); // Mencegah reload/trigger router jika sudah di dashboard
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth", // Efek scroll halus
+      });
+    }
+  };
+
   return (
     // Outer wrapper: full width, sticky, transparent — just for positioning
     <div className="sticky top-0 z-50 w-full flex justify-center pt-3 pb-1 pointer-events-none">
@@ -112,6 +124,7 @@ function DashboardNavbar({
         {/* Left — Logo */}
         <Link
           href="/dashboard"
+          onClick={handleLogoClick}
           className="flex items-center gap-2 flex-shrink-0 group cursor-pointer"
         >
           <div className="p-1.5 bg-emerald-500/15 border border-emerald-500/25 rounded-xl text-emerald-500 dark:text-emerald-400 group-hover:bg-emerald-500/25 group-hover:border-emerald-500/40 group-hover:scale-105 transition-all duration-300">
@@ -257,9 +270,7 @@ function DashboardFooter() {
               keadilan.
             </p>
             <div className="flex items-start gap-2.5 bg-amber-950/30 border border-amber-800/30 rounded-xl px-3.5 py-3">
-              <span className="text-amber-400 text-sm mt-0.5 flex-shrink-0">
-                ⚠
-              </span>
+              <AlertTriangle className="w-4 h-4 text-amber-400 mt-0.5 flex-shrink-0" />
               <p className="text-[10px] text-amber-400/80 leading-relaxed">
                 Bukan pengganti konsultasi pengacara profesional. Untuk kasus
                 serius, selalu hubungi LBH atau advokat.
@@ -460,8 +471,25 @@ export default function DashboardPage() {
         });
         const data = await response.json();
         if (Array.isArray(data)) {
-          setCases(data);
-          calculateStats(data);
+          // Generate signed URL untuk setiap kasus yang punya document_url
+          const casesWithSignedUrl = await Promise.all(
+            data.map(async (item: Case) => {
+              if (item.document_url && !item.document_url.startsWith("http")) {
+                try {
+                  const res = await fetch(`/api/cases?case_id=${item.id}`, {
+                    headers: { Authorization: `Bearer ${token}` },
+                  });
+                  const refreshed = await res.json();
+                  return { ...item, document_url: refreshed.document_url };
+                } catch {
+                  return item;
+                }
+              }
+              return item;
+            }),
+          );
+          setCases(casesWithSignedUrl);
+          calculateStats(casesWithSignedUrl);
         }
       } catch (err) {
         console.error("Error loading cases:", err);
