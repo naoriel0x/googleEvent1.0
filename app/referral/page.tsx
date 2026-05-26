@@ -5,24 +5,12 @@ import { getSupabaseClient } from "@/lib/supabase";
 import { LBHCard } from "@/components/referral/LBHCard";
 import { LBHMap } from "@/components/referral/LBHMap";
 import type { LBH, ViolationType } from "@/types";
-import { MapPin, Info, Check, AlertCircle, Compass, Users } from "lucide-react";
+import { MapPin, Info, Check, AlertCircle, Compass, Users, ChevronLeft, ChevronRight } from "lucide-react";
 
-// =========================================================================
-// INISIALISASI SUPABASE
-// =========================================================================
-// Pastikan kamu sudah mengisi NEXT_PUBLIC_SUPABASE_URL & NEXT_PUBLIC_SUPABASE_ANON_KEY di file .env.local kamu
 const supabase = getSupabaseClient();
 
-// =========================================================================
-// FUNGSI HELPER (RUMUS HARVESINE UNTUK JARAK)
-// =========================================================================
-function calculateDistance(
-  lat1: number,
-  lon1: number,
-  lat2: number,
-  lon2: number,
-): number {
-  const R = 6371; // Radius bumi dalam kilometer
+function calculateDistance(lat1: number, lon1: number, lat2: number, lon2: number): number {
+  const R = 6371;
   const dLat = (lat2 - lat1) * (Math.PI / 180);
   const dLon = (lon2 - lon1) * (Math.PI / 180);
   const a =
@@ -43,39 +31,128 @@ const violationTypes: { value: ViolationType; label: string }[] = [
 ];
 
 const DEFAULT_CENTER = { lat: -6.2088, lng: 106.8456 };
+const ITEMS_PER_PAGE = 10;
 
+// =========================================================================
+// KOMPONEN PAGINATION
+// =========================================================================
+function Pagination({
+  currentPage,
+  totalPages,
+  onPageChange,
+}: {
+  currentPage: number;
+  totalPages: number;
+  onPageChange: (page: number) => void;
+}) {
+  if (totalPages <= 1) return null;
+
+  // Logika untuk menampilkan nomor halaman yang relevan
+  const getPageNumbers = () => {
+    const pages: (number | "...")[] = [];
+    if (totalPages <= 7) {
+      for (let i = 1; i <= totalPages; i++) pages.push(i);
+    } else {
+      pages.push(1);
+      if (currentPage > 3) pages.push("...");
+      const start = Math.max(2, currentPage - 1);
+      const end = Math.min(totalPages - 1, currentPage + 1);
+      for (let i = start; i <= end; i++) pages.push(i);
+      if (currentPage < totalPages - 2) pages.push("...");
+      pages.push(totalPages);
+    }
+    return pages;
+  };
+
+  return (
+    <div className="flex items-center justify-center gap-1.5 mt-8 flex-wrap">
+      {/* Tombol Prev */}
+      <button
+        onClick={() => onPageChange(currentPage - 1)}
+        disabled={currentPage === 1}
+        className="flex items-center gap-1 px-3 py-2 rounded-xl text-sm font-semibold
+          bg-slate-800/60 border border-slate-700/60 text-slate-300
+          hover:bg-slate-700 hover:border-slate-600 hover:text-white
+          disabled:opacity-30 disabled:cursor-not-allowed
+          transition-all duration-200"
+        aria-label="Halaman sebelumnya"
+      >
+        <ChevronLeft className="w-4 h-4" />
+        <span className="hidden sm:inline">Prev</span>
+      </button>
+
+      {/* Nomor Halaman */}
+      {getPageNumbers().map((page, idx) =>
+        page === "..." ? (
+          <span key={`ellipsis-${idx}`} className="px-2 py-2 text-slate-500 text-sm select-none">
+            ...
+          </span>
+        ) : (
+          <button
+            key={page}
+            onClick={() => onPageChange(page as number)}
+            className={`min-w-[2.25rem] h-9 px-2 rounded-xl text-sm font-semibold transition-all duration-200 ${
+              currentPage === page
+                ? "bg-emerald-600 text-white shadow-md shadow-emerald-600/30 scale-105"
+                : "bg-slate-800/60 border border-slate-700/60 text-slate-300 hover:bg-slate-700 hover:border-slate-600 hover:text-white"
+            }`}
+            aria-label={`Halaman ${page}`}
+            aria-current={currentPage === page ? "page" : undefined}
+          >
+            {page}
+          </button>
+        )
+      )}
+
+      {/* Tombol Next */}
+      <button
+        onClick={() => onPageChange(currentPage + 1)}
+        disabled={currentPage === totalPages}
+        className="flex items-center gap-1 px-3 py-2 rounded-xl text-sm font-semibold
+          bg-slate-800/60 border border-slate-700/60 text-slate-300
+          hover:bg-slate-700 hover:border-slate-600 hover:text-white
+          disabled:opacity-30 disabled:cursor-not-allowed
+          transition-all duration-200"
+        aria-label="Halaman berikutnya"
+      >
+        <span className="hidden sm:inline">Next</span>
+        <ChevronRight className="w-4 h-4" />
+      </button>
+
+      {/* Info halaman */}
+      <span className="w-full text-center text-xs text-slate-500 mt-1">
+        Halaman {currentPage} dari {totalPages}
+      </span>
+    </div>
+  );
+}
+
+// =========================================================================
+// HALAMAN UTAMA
+// =========================================================================
 export default function ReferralPage() {
-  // State untuk menampung data mentah asli dari database Supabase
   const [masterLbhList, setMasterLbhList] = useState<LBH[]>([]);
-  // State untuk data yang aktif ditampilkan di UI (setelah filter/sort)
   const [lbhList, setLbhList] = useState<LBH[]>([]);
-
-  const [selectedSpecialization, setSelectedSpecialization] = useState<
-    ViolationType | ""
-  >("");
-  const [userLocation, setUserLocation] = useState<{
-    lat: number;
-    lng: number;
-  } | null>(null);
+  const [selectedSpecialization, setSelectedSpecialization] = useState<ViolationType | "">("");
+  const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [locationLoading, setLocationLoading] = useState(false);
-  const [dbLoading, setDbLoading] = useState(true); // State loading untuk database
+  const [dbLoading, setDbLoading] = useState(true);
+
+  // ✅ STATE PAGINATION
+  const [currentPage, setCurrentPage] = useState(1);
 
   // -------------------------------------------------------------------------
-  // EFFEK 1: Ambil Data Asli dari Supabase Saat Pertama Kali Halaman Dimuat
+  // EFFEK 1: Ambil Data dari Supabase
   // -------------------------------------------------------------------------
   useEffect(() => {
     async function fetchLBHFromSupabase() {
       try {
         setDbLoading(true);
-        const { data, error } = await supabase
-          .from("direktori_lbh") // Membaca tabel direktori_lbh yang dibuat di SQL Editor
-          .select("*");
-
+        const { data, error } = await supabase.from("direktori_lbh").select("*");
         if (error) throw error;
-
         if (data) {
           setMasterLbhList(data as LBH[]);
-          setLbhList(data as LBH[]); // Default awal, tampilkan semua data sebelum lokasi didapat
+          setLbhList(data as LBH[]);
         }
       } catch (err) {
         console.error("Gagal memuat database LBH dari Supabase:", err);
@@ -83,47 +160,30 @@ export default function ReferralPage() {
         setDbLoading(false);
       }
     }
-
     fetchLBHFromSupabase();
   }, []);
 
   // -------------------------------------------------------------------------
-  // EFFEK 2: Jalankan GPS Hanya Setelah Data Master Supabase Selesai Di-load
+  // EFFEK 2: GPS setelah data master selesai
   // -------------------------------------------------------------------------
   useEffect(() => {
-    // Jika data dari database belum beres di-download, jangan jalankan GPS dulu
     if (masterLbhList.length === 0) return;
-
     let cancelled = false;
-
-    if (!navigator.geolocation) {
-      return;
-    }
+    if (!navigator.geolocation) return;
 
     const timeoutId = setTimeout(() => setLocationLoading(true), 0);
-    const geoOptions: PositionOptions = {
-      enableHighAccuracy: true,
-      timeout: 10000,
-      maximumAge: 0,
-    };
+    const geoOptions: PositionOptions = { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 };
 
     const handleGPSSuccess = (position: GeolocationPosition) => {
       clearTimeout(timeoutId);
       if (cancelled) return;
-
-      const loc = {
-        lat: position.coords.latitude,
-        lng: position.coords.longitude,
-      };
+      const loc = { lat: position.coords.latitude, lng: position.coords.longitude };
       setUserLocation(loc);
-
-      // Urutkan data master LBH Supabase dari jarak yang paling dekat dengan user
       const sortedByDistance = [...masterLbhList].sort(
         (a, b) =>
           calculateDistance(loc.lat, loc.lng, a.lat, a.lng) -
-          calculateDistance(loc.lat, loc.lng, b.lat, b.lng),
+          calculateDistance(loc.lat, loc.lng, b.lat, b.lng)
       );
-
       setLbhList(sortedByDistance);
       setLocationLoading(false);
     };
@@ -133,96 +193,82 @@ export default function ReferralPage() {
       setLocationLoading(false);
     };
 
-    // Pengecekan Permissions API bawaan kodemu
     if (navigator.permissions && (navigator.permissions as any).query) {
       try {
-        (navigator.permissions as any)
-          .query({ name: "geolocation" })
-          .then((permStatus: any) => {
-            if (permStatus.state === "denied") {
-              clearTimeout(timeoutId);
-              setLocationLoading(false);
-              return;
-            }
-            navigator.geolocation.getCurrentPosition(
-              handleGPSSuccess,
-              handleGPSError,
-              geoOptions,
-            );
-          });
-      } catch (e) {
-        navigator.geolocation.getCurrentPosition(
-          handleGPSSuccess,
-          handleGPSError,
-          geoOptions,
-        );
+        (navigator.permissions as any).query({ name: "geolocation" }).then((permStatus: any) => {
+          if (permStatus.state === "denied") {
+            clearTimeout(timeoutId);
+            setLocationLoading(false);
+            return;
+          }
+          navigator.geolocation.getCurrentPosition(handleGPSSuccess, handleGPSError, geoOptions);
+        });
+      } catch {
+        navigator.geolocation.getCurrentPosition(handleGPSSuccess, handleGPSError, geoOptions);
       }
     } else {
-      navigator.geolocation.getCurrentPosition(
-        handleGPSSuccess,
-        handleGPSError,
-        geoOptions,
-      );
+      navigator.geolocation.getCurrentPosition(handleGPSSuccess, handleGPSError, geoOptions);
     }
 
     return () => {
       cancelled = true;
       clearTimeout(timeoutId);
     };
-  }, [masterLbhList]); // Triger otomatis jalan begitu masterLbhList terisi data Supabase
+  }, [masterLbhList]);
 
   // -------------------------------------------------------------------------
-  // FUNGSI: Handle Perubahan Filter Spesialisasi
+  // FUNGSI: Filter + reset ke halaman 1 setiap kali filter berubah
   // -------------------------------------------------------------------------
   const handleSpecializationChange = (spec: ViolationType | "") => {
     setSelectedSpecialization(spec);
+    setCurrentPage(1); // ✅ Reset ke halaman 1 saat filter berubah
 
-    // Selalu mulai filter dari data mentah asli Supabase (masterLbhList)
     let filteredResults = [...masterLbhList];
-
-    // 1. Filter berdasarkan spesialisasi kasus jika dipilih
     if (spec !== "") {
       filteredResults = filteredResults.filter(
-        (lbh) => lbh.specialization && lbh.specialization.includes(spec),
+        (lbh) => lbh.specialization && lbh.specialization.includes(spec)
       );
     }
-
-    // 2. Jika lokasi user terdeteksi, urutkan hasil filter dari yang terdekat
     if (userLocation) {
       filteredResults = filteredResults.sort(
         (a, b) =>
           calculateDistance(userLocation.lat, userLocation.lng, a.lat, a.lng) -
-          calculateDistance(userLocation.lat, userLocation.lng, b.lat, b.lng),
+          calculateDistance(userLocation.lat, userLocation.lng, b.lat, b.lng)
       );
     }
-
     setLbhList(filteredResults);
   };
 
   const mapCenter = userLocation ?? DEFAULT_CENTER;
 
+  // ✅ Semua data dengan jarak
   const lbhWithDistance = useMemo(() => {
-    if (!userLocation)
-      return lbhList.map((lbh) => ({
-        lbh,
-        distance: undefined as number | undefined,
-      }));
+    if (!userLocation) return lbhList.map((lbh) => ({ lbh, distance: undefined as number | undefined }));
     return lbhList.map((lbh) => ({
       lbh,
-      distance: calculateDistance(
-        userLocation.lat,
-        userLocation.lng,
-        lbh.lat,
-        lbh.lng,
-      ),
+      distance: calculateDistance(userLocation.lat, userLocation.lng, lbh.lat, lbh.lng),
     }));
   }, [lbhList, userLocation]);
+
+  // ✅ Hitung total halaman & slice data untuk halaman aktif
+  const totalPages = Math.ceil(lbhWithDistance.length / ITEMS_PER_PAGE);
+  const paginatedLbh = useMemo(() => {
+    const start = (currentPage - 1) * ITEMS_PER_PAGE;
+    return lbhWithDistance.slice(start, start + ITEMS_PER_PAGE);
+  }, [lbhWithDistance, currentPage]);
+
+  // ✅ Fungsi ganti halaman + scroll ke atas section LBH
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    document.getElementById("lbh-list-section")?.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
 
   return (
     <div className="min-h-dvh bg-slate-950 text-slate-100 transition-colors duration-500 flex-1 flex flex-col relative">
       {/* Decorative blobs */}
       <div className="fixed top-0 right-0 w-[40%] h-[30%] bg-emerald-950/15 rounded-full blur-[140px] pointer-events-none z-0" />
       <div className="fixed bottom-0 left-0 w-[40%] h-[35%] bg-teal-950/10 rounded-full blur-[140px] pointer-events-none z-0" />
+
       <div className="flex-1 max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 pb-8 space-y-10 relative z-10">
         {/* Title */}
         <div>
@@ -230,8 +276,7 @@ export default function ReferralPage() {
             Temukan LBH Terdekat
           </h1>
           <p className="text-slate-400 text-sm sm:text-base">
-            Hubungi Lembaga Bantuan Hukum untuk konsultasi lanjutan tentang
-            kasusmu.
+            Hubungi Lembaga Bantuan Hukum untuk konsultasi lanjutan tentang kasusmu.
           </p>
         </div>
 
@@ -260,7 +305,6 @@ export default function ReferralPage() {
           <div className="lg:col-span-2">
             <LBHMap center={mapCenter} lbhList={lbhList} />
           </div>
-
           <div className="lg:col-span-1">
             <div className="bg-slate-900/40 border border-slate-800/80 rounded-2xl p-6 shadow-sm space-y-4 h-full">
               <h3 className="font-bold text-slate-100 flex items-center gap-2">
@@ -301,14 +345,12 @@ export default function ReferralPage() {
                   Menghubungkan ke database Supabase...
                 </p>
               )}
-
               {locationLoading && (
                 <p className="text-xs text-slate-400 flex items-center gap-1.5 font-medium">
                   <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
                   Mencari lokasi Anda...
                 </p>
               )}
-
               {userLocation && !locationLoading && (
                 <p className="text-xs text-slate-400 flex items-center gap-1.5 font-medium">
                   <MapPin className="w-3.5 h-3.5 text-emerald-400" />
@@ -320,7 +362,7 @@ export default function ReferralPage() {
         </div>
 
         {/* LBH List */}
-        <section>
+        <section id="lbh-list-section">
           <h2 className="text-xl sm:text-2xl font-bold text-slate-100 mb-6 flex items-center gap-2">
             <Users className="w-6 h-6 text-emerald-400" />
             {dbLoading
@@ -341,11 +383,26 @@ export default function ReferralPage() {
               </p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
-              {lbhWithDistance.map(({ lbh, distance }) => (
-                <LBHCard key={lbh.id} lbh={lbh} distance={distance} />
-              ))}
-            </div>
+            <>
+              {/* ✅ Info halaman aktif */}
+              <p className="text-xs text-slate-500 mb-4">
+                Menampilkan {(currentPage - 1) * ITEMS_PER_PAGE + 1}–
+                {Math.min(currentPage * ITEMS_PER_PAGE, lbhList.length)} dari {lbhList.length} LBH
+              </p>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
+                {paginatedLbh.map(({ lbh, distance }) => (
+                  <LBHCard key={lbh.id} lbh={lbh} distance={distance} />
+                ))}
+              </div>
+
+              {/* ✅ Komponen Pagination */}
+              <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={handlePageChange}
+              />
+            </>
           )}
         </section>
 
