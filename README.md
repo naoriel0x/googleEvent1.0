@@ -4,7 +4,7 @@
 
 **A digital evidence documentation platform for victims of forced evictions, land disputes, and civil rights violations in Indonesia.**
 
-Built for [#JuaraVibeCoding](https://gdg.community.dev/events/details/google-gdg-cloud-jakarta-presents-juaravibecoding-kick-off-event/) — a Google for Developers event · _Code Less, Build More_
+Built for [#JuaraVibeCoding](https://gdg.community.dev/events/details/google-gdg-cloud-jakarta-presents-juaravibecoding-kick-off-event/) | a Google for Developers event · _Code Less, Build More_
 
 [![Next.js](https://img.shields.io/badge/Next.js-15-black?logo=next.js)](https://nextjs.org)
 [![Gemini](https://img.shields.io/badge/Gemini-2.5_Flash-4285F4?logo=google)](https://ai.google.dev)
@@ -37,12 +37,14 @@ Users simply describe what happened through an AI chat interface. The system aut
 
 ## Tech Stack
 
-- **Framework** — Next.js 15 (App Router)
-- **AI** — Google Gemini 2.5 Flash via Vertex AI
-- **Database & Storage** — Supabase (PostgreSQL + Storage Buckets)
-- **Styling** — Tailwind CSS v4
-- **PDF** — jsPDF
-- **Maps** — Google Maps Embed API
+| Layer | Detail |
+|---|---|
+| **Framework** | Next.js 15 (App Router) |
+| **AI** | Google Gemini 2.5 Flash via Vertex AI |
+| **Database & Storage** | Supabase (PostgreSQL + Storage Buckets) |
+| **Styling** | Tailwind CSS v4 |
+| **PDF** | jsPDF |
+| **Maps** | Google Maps Embed API |
 
 ---
 
@@ -128,7 +130,7 @@ witnesschain/
 
 ## About #JuaraVibeCoding
 
-[#JuaraVibeCoding](https://gdg.community.dev/events/details/google-gdg-cloud-jakarta-presents-juaravibecoding-kick-off-event/) is a **Google for Developers** program that invites everyone — regardless of coding background — to build real applications using AI.
+[#JuaraVibeCoding](https://gdg.community.dev/events/details/google-gdg-cloud-jakarta-presents-juaravibecoding-kick-off-event/) is a **Google for Developers** program that invites everyone, regardless of coding background, to build real applications using AI.
 
 > _"Your ideas are the only 'code' you need."_
 
